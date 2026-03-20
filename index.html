@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>NFT CARD GENERATOR PRO</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050500;
+  --panel: rgba(8,6,0,0.97);
+  --border: rgba(255,80,0,0.22);
+  --accent: #ff4400;
+  --accent2: #ff8800;
+  --gold: #ffcc00;
+  --text: #ffd0a0;
+  --dim: #7a4a20;
+  --success: #00ff88;
+  --danger: #ff2244;
+  --flame1: #ff2200;
+  --flame2: #ff6600;
+  --flame3: #ffaa00;
+  --flame4: #ffee00;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+/* ── VIBRATE ON CLICK ── */
+@keyframes vibrate {
+  0%   { transform: translate(0,0) rotate(0deg) scale(1); }
+  10%  { transform: translate(-3px,2px) rotate(-1deg) scale(1.02); }
+  20%  { transform: translate(3px,-2px) rotate(1deg) scale(0.98); }
+  30%  { transform: translate(-2px,3px) rotate(-0.5deg) scale(1.02); }
+  40%  { transform: translate(2px,-3px) rotate(0.5deg) scale(0.98); }
+  50%  { transform: translate(-3px,1px) rotate(-1deg) scale(1.01); }
+  60%  { transform: translate(3px,-1px) rotate(1deg) scale(0.99); }
+  70%  { transform: translate(-1px,2px) rotate(-0.5deg) scale(1.01); }
+  80%  { transform: translate(1px,-2px) rotate(0.5deg) scale(0.99); }
+  90%  { transform: translate(-2px,1px) rotate(-0.3deg) scale(1); }
+  100% { transform: translate(0,0) rotate(0deg) scale(1); }
+}
+
+.vibrating {
+  animation: vibrate 0.4s cubic-bezier(0.36,0.07,0.19,0.97) !important;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* ── FLAME BACKGROUND ── */
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background:
+    radial-gradient(ellipse at 15% 100%, rgba(255,34,0,0.22) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 100%, rgba(255,100,0,0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(255,170,0,0.12) 0%, transparent 45%),
+    radial-gradient(ellipse at 30% 60%, rgba(255,50,0,0.08) 0%, transparent 40%),
+    radial-gradient(ellipse at 70% 40%, rgba(200,30,0,0.06) 0%, transparent 40%);
+  pointer-events:none; z-index:0;
+  animation: flamePulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes flamePulse {
+  0%   { opacity:0.7; transform:scaleY(1); }
+  50%  { opacity:1;   transform:scaleY(1.04); }
+  100% { opacity:0.8; transform:scaleY(0.97); }
+}
+
+/* ── EMBER GRID ── */
+body::after {
+  content:'';
+  position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(255,80,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,80,0,0.04) 1px, transparent 1px);
+  background-size:36px 36px;
+  pointer-events:none; z-index:0;
+}
+
+/* ── FLAME PARTICLES (CSS only) ── */
+.flame-layer {
+  position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+}
+.ember {
+  position:absolute;
+  bottom:-10px;
+  width:4px; height:4px;
+  border-radius:50%;
+  background:var(--flame2);
+  box-shadow:0 0 6px var(--flame1), 0 0 12px var(--flame2);
+  animation: riseEmber linear infinite;
+  opacity:0;
+}
+.ember:nth-child(1)  { left:5%;  width:3px;height:3px; animation-duration:3.2s; animation-delay:0s;    background:var(--flame1); }
+.ember:nth-child(2)  { left:12%; width:5px;height:5px; animation-duration:2.8s; animation-delay:0.4s;  background:var(--flame3); }
+.ember:nth-child(3)  { left:20%; width:3px;height:3px; animation-duration:3.6s; animation-delay:0.8s;  background:var(--flame2); }
+.ember:nth-child(4)  { left:30%; width:6px;height:6px; animation-duration:2.4s; animation-delay:1.2s;  background:var(--flame4); }
+.ember:nth-child(5)  { left:40%; width:3px;height:3px; animation-duration:3.0s; animation-delay:0.6s;  background:var(--flame1); }
+.ember:nth-child(6)  { left:50%; width:4px;height:4px; animation-duration:2.6s; animation-delay:1.6s;  background:var(--flame3); }
+.ember:nth-child(7)  { left:60%; width:5px;height:5px; animation-duration:3.4s; animation-delay:0.2s;  background:var(--flame2); }
+.ember:nth-child(8)  { left:70%; width:3px;height:3px; animation-duration:2.9s; animation-delay:1.0s;  background:var(--flame4); }
+.ember:nth-child(9)  { left:80%; width:4px;height:4px; animation-duration:3.1s; animation-delay:0.5s;  background:var(--flame1); }
+.ember:nth-child(10) { left:90%; width:6px;height:6px; animation-duration:2.7s; animation-delay:1.4s;  background:var(--flame3); }
+.ember:nth-child(11) { left:8%;  width:3px;height:3px; animation-duration:3.8s; animation-delay:1.8s;  background:var(--flame2); }
+.ember:nth-child(12) { left:25%; width:4px;height:4px; animation-duration:2.5s; animation-delay:0.9s;  background:var(--flame4); }
+.ember:nth-child(13) { left:45%; width:5px;height:5px; animation-duration:3.3s; animation-delay:2.1s;  background:var(--flame1); }
+.ember:nth-child(14) { left:65%; width:3px;height:3px; animation-duration:2.2s; animation-delay:0.3s;  background:var(--flame3); }
+.ember:nth-child(15) { left:85%; width:4px;height:4px; animation-duration:3.5s; animation-delay:1.7s;  background:var(--flame2); }
+.ember:nth-child(16) { left:55%; width:6px;height:6px; animation-duration:2.3s; animation-delay:2.5s;  background:var(--flame4); }
+
+@keyframes riseEmber {
+  0%   { opacity:0; transform:translateY(0) translateX(0) scale(1); }
+  10%  { opacity:0.9; }
+  50%  { opacity:0.6; transform:translateY(-45vh) translateX(20px) scale(0.7); }
+  90%  { opacity:0.2; }
+  100% { opacity:0; transform:translateY(-95vh) translateX(-10px) scale(0.2); }
+}
+
+.wrap {
+  position:relative; z-index:1;
+  max-width:1200px;
+  margin:0 auto;
+  padding:24px 16px;
+  display:grid;
+  grid-template-columns:420px 1fr;
+  gap:24px;
+  align-items:start;
+}
+
+/* HEADER */
+.header {
+  grid-column:1/-1;
+  text-align:center;
+  padding:24px 0 8px;
+}
+
+.header h1 {
+  font-family:'Orbitron',monospace;
+  font-size:clamp(22px,4vw,42px);
+  font-weight:900;
+  letter-spacing:6px;
+  background:linear-gradient(90deg,#ff2200,#ff6600,#ffaa00,#ffee00,#ff6600,#ff2200);
+  background-size:200% auto;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  animation:flameText 3s linear infinite;
+  filter:drop-shadow(0 0 20px rgba(255,80,0,0.6));
+}
+
+@keyframes flameText {
+  0%   { background-position:0% center; }
+  100% { background-position:200% center; }
+}
+
+.header p {
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;
+  color:#7a4a20;
+  letter-spacing:3px;
+  margin-top:6px;
+}
+
+/* PANEL */
+.panel {
+  background:rgba(8,4,0,0.97);
+  border:1px solid rgba(255,80,0,0.2);
+  border-radius:16px;
+  padding:24px;
+  position:relative;
+  backdrop-filter:blur(20px);
+  box-shadow:0 4px 40px rgba(255,50,0,0.08), inset 0 0 40px rgba(0,0,0,0.5);
+}
+
+.panel::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,#ff4400,#ff8800,#ff4400,transparent);
+  border-radius:16px 16px 0 0;
+  animation:flameLine 2s ease-in-out infinite alternate;
+}
+
+@keyframes flameLine {
+  0%   { opacity:0.5; }
+  100% { opacity:1; box-shadow:0 0 8px #ff4400; }
+}
+
+.panel-title {
+  font-family:'Orbitron',monospace;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:3px;
+  color:#7a4a20;
+  margin-bottom:20px;
+  padding-bottom:12px;
+  border-bottom:1px solid rgba(255,80,0,0.15);
+}
+
+/* UPLOAD ZONE */
+.upload-zone {
+  border:2px dashed rgba(255,80,0,0.35);
+  border-radius:12px;
+  padding:32px 20px;
+  text-align:center;
+  cursor:pointer;
+  transition:all 0.3s;
+  margin-bottom:20px;
+  position:relative;
+  overflow:hidden;
+}
+
+.upload-zone:hover, .upload-zone.drag {
+  border-color:#ff4400;
+  background:rgba(255,68,0,0.06);
+  box-shadow:0 0 20px rgba(255,68,0,0.15);
+}
+
+.upload-zone input {
+  position:absolute; inset:0;
+  opacity:0; cursor:pointer;
+  width:100%; height:100%;
+}
+
+.upload-icon { font-size:36px; margin-bottom:8px; }
+.upload-text { font-family:'Share Tech Mono',monospace; font-size:12px; color:#7a4a20; }
+.upload-text strong { color:#ff6600; }
+
+/* FORM ELEMENTS */
+.field { margin-bottom:16px; }
+.field label {
+  display:block;
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;
+  letter-spacing:2px;
+  color:#7a4a20;
+  margin-bottom:6px;
+}
+
+.field input[type="text"],
+.field select {
+  width:100%;
+  background:rgba(255,60,0,0.04);
+  border:1px solid rgba(255,80,0,0.18);
+  border-radius:8px;
+  color:#ffd0a0;
+  font-family:'Rajdhani',sans-serif;
+  font-size:15px;
+  font-weight:600;
+  padding:10px 14px;
+  outline:none;
+  transition:border-color 0.2s;
+  -webkit-appearance:none;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color:#ff4400;
+  box-shadow:0 0 10px rgba(255,68,0,0.2);
+}
+
+.field select option { background:#0d0400; color:#ffd0a0; }
+
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+/* STAT SLIDERS */
+.stat-row {
+  display:grid;
+  grid-template-columns:80px 1fr 36px;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.stat-label {
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;
+  color:#7a4a20;
+  letter-spacing:1px;
+}
+
+.stat-val {
+  font-family:'Orbitron',monospace;
+  font-size:13px;
+  font-weight:700;
+  color:#ff8800;
+  text-align:right;
+}
+
+input[type="range"] {
+  -webkit-appearance:none;
+  width:100%;
+  height:4px;
+  border-radius:2px;
+  background:rgba(255,80,0,0.12);
+  outline:none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance:none;
+  width:16px; height:16px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#ff2200,#ff8800);
+  cursor:pointer;
+  box-shadow:0 0 8px rgba(255,68,0,0.7);
+}
+
+/* COLOR BUTTONS */
+.colors-grid {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:6px;
+  margin-top:8px;
+}
+
+.color-btn {
+  height:36px;
+  border-radius:8px;
+  border:2px solid transparent;
+  cursor:pointer;
+  font-size:9px;
+  font-family:'Share Tech Mono',monospace;
+  font-weight:700;
+  letter-spacing:1px;
+  transition:all 0.2s;
+  position:relative;
+  overflow:hidden;
+}
+
+.color-btn.active {
+  border-color:white;
+  box-shadow:0 0 12px currentColor;
+  transform:scale(1.05);
+}
+
+.color-btn.active::after {
+  content:'✓';
+  position:absolute;
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  font-size:14px;
+  color:rgba(255,255,255,0.9);
+}
+
+/* ACTION BUTTONS */
+.btn-row {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:20px;
+}
+
+.btn {
+  width:100%;
+  font-family:'Orbitron',monospace;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:2px;
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  transition:box-shadow 0.25s, filter 0.25s;
+  position:relative;
+  overflow:hidden;
+}
+
+.btn::after {
+  content:'';
+  position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.12),transparent);
+  opacity:0;
+  transition:opacity 0.2s;
+}
+
+.btn:hover::after { opacity:1; }
+.btn:hover { filter:brightness(1.15); }
+
+.btn-generate {
+  background:linear-gradient(135deg,#cc2000,#ff4400,#ff7700);
+  color:#fff;
+  box-shadow:0 4px 24px rgba(255,68,0,0.5);
+  border:1px solid rgba(255,120,0,0.3);
+  text-shadow:0 1px 4px rgba(0,0,0,0.5);
+}
+
+.btn-download {
+  background:linear-gradient(135deg,#1a1a00,#665500,#ffaa00);
+  color:#fff;
+  box-shadow:0 4px 20px rgba(255,170,0,0.3);
+  border:1px solid rgba(255,200,0,0.2);
+}
+
+.btn-video {
+  background:linear-gradient(135deg,#300,#aa1100,#ff3300);
+  color:#ffaa88;
+  box-shadow:0 4px 20px rgba(200,0,0,0.3);
+  border:1px solid rgba(255,80,0,0.2);
+}
+
+.btn:disabled {
+  opacity:0.35;
+  cursor:not-allowed;
+  filter:none !important;
+}
+
+/* STATUS */
+.status {
+  margin-top:14px;
+  padding:10px 14px;
+  background:rgba(0,0,0,0.5);
+  border:1px solid rgba(255,80,0,0.15);
+  border-radius:8px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;
+  color:#7a4a20;
+  text-align:center;
+  min-height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:all 0.3s;
+}
+
+.status.ok     { color:#00ff88; border-color:rgba(0,255,136,0.3); }
+.status.err    { color:#ff2244; border-color:rgba(255,34,68,0.3); }
+.status.active { color:#ff8800; border-color:rgba(255,136,0,0.3); }
+
+/* CANVAS PANEL */
+.canvas-panel {
+  position:sticky;
+  top:24px;
+}
+
+.canvas-wrap {
+  background:rgba(0,0,0,0.7);
+  border:1px solid rgba(255,80,0,0.15);
+  border-radius:16px;
+  padding:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:400px;
+}
+
+#canvas {
+  max-width:100%;
+  border-radius:12px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.9), 0 0 40px rgba(255,68,0,0.15);
+  display:block;
+}
+
+.canvas-placeholder {
+  text-align:center;
+  color:#7a4a20;
+  font-family:'Share Tech Mono',monospace;
+  font-size:12px;
+}
+
+.canvas-placeholder .icon { font-size:48px; margin-bottom:12px; opacity:0.4; }
+
+/* PREVIEW BADGE */
+.preview-info {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:12px;
+  padding:8px 12px;
+  background:rgba(0,0,0,0.4);
+  border-radius:8px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;
+  color:#7a4a20;
+}
+
+/* MOBILE */
+@media(max-width:768px) {
+  .wrap {
+    grid-template-columns:1fr;
+    padding:12px;
+    gap:16px;
+  }
+  .canvas-panel { position:static; }
+  .header h1 { font-size:22px; letter-spacing:3px; }
+  .colors-grid { grid-template-columns:repeat(4,1fr); }
+}
+
+/* PROGRESS BAR */
+.progress-wrap {
+  margin-top:10px;
+  height:3px;
+  background:rgba(255,80,0,0.1);
+  border-radius:2px;
+  overflow:hidden;
+  display:none;
+}
+
+.progress-wrap.show { display:block; }
+
+.progress-fill {
+  height:100%;
+  background:linear-gradient(90deg,#ff2200,#ff6600,#ffaa00);
+  border-radius:2px;
+  transition:width 0.1s;
+  box-shadow:0 0 8px rgba(255,100,0,0.8);
+}
+
+/* RECORDING INDICATOR */
+.rec-indicator {
+  display:none;
+  align-items:center;
+  gap:8px;
+  padding:8px 14px;
+  background:rgba(255,34,0,0.12);
+  border:1px solid rgba(255,34,0,0.3);
+  border-radius:8px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;
+  color:#ff4422;
+  margin-top:10px;
+}
+
+.rec-indicator.show { display:flex; }
+
+.rec-dot {
+  width:8px; height:8px;
+  background:#ff2200;
+  border-radius:50%;
+  animation:recPulse 1s ease-in-out infinite;
+  box-shadow:0 0 6px #ff2200;
+}
+
+@keyframes recPulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50% { opacity:0.4; transform:scale(0.8); }
+}
+</style>
+</head>
+<body>
+
+<!-- FLAME PARTICLES -->
+<div class="flame-layer">
+  <div class="ember"></div><div class="ember"></div><div class="ember"></div>
+  <div class="ember"></div><div class="ember"></div><div class="ember"></div>
+  <div class="ember"></div><div class="ember"></div><div class="ember"></div>
+  <div class="ember"></div><div class="ember"></div><div class="ember"></div>
+  <div class="ember"></div><div class="ember"></div><div class="ember"></div>
+  <div class="ember"></div>
+</div>
+
+<div class="wrap">
+
+  <div class="header">
+    <h1>🔥 NFT CARD GENERATOR 🔥</h1>
+    <p>ANIMATED · ON-CHAIN READY · DOWNLOAD PNG & VIDEO</p>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="panel">
+    <div class="panel-title">// CARD CONFIGURATION</div>
+
+    <!-- UPLOAD -->
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="imageInput" accept="image/*">
+      <div class="upload-icon" id="uploadIcon">🖼️</div>
+      <div class="upload-text" id="uploadText">
+        <strong>Click or drag</strong> to upload image<br>
+        PNG, JPG, GIF, WEBP supported
+      </div>
+    </div>
+
+    <!-- NAME -->
+    <div class="field">
+      <label>NFT NAME</label>
+      <input type="text" id="nftName" value="EPIC NFT #001" placeholder="Enter NFT name">
+    </div>
+
+    <!-- RARITY -->
+    <div class="field">
+      <label>RARITY GRADE</label>
+      <select id="rarityGrade">
+        <option value="SSS+|#ff00ff,#00ffff|👑|MYTHIC">👑 SSS+ MYTHIC — Holographic</option>
+        <option value="SSS|#ff0080,#8000ff|💎|LEGENDARY">💎 SSS LEGENDARY — Pink/Purple</option>
+        <option value="SS|#ffff00,#ff6600|⭐|EPIC" selected>⭐ SS EPIC — Gold/Orange</option>
+        <option value="S|#00ff00,#00ffff|🌟|RARE">🌟 S RARE — Green/Cyan</option>
+        <option value="A|#ff00ff,#ff0099|✨|UNCOMMON">✨ A UNCOMMON — Magenta</option>
+        <option value="B|#ffffff,#aaaaaa|🔷|COMMON">🔷 B COMMON — Silver</option>
+      </select>
+    </div>
+
+    <!-- EDITION / SERIAL -->
+    <div class="field">
+      <label>EDITION & SERIAL</label>
+      <div class="grid2">
+        <input type="text" id="edition" placeholder="1/100" value="1/100">
+        <input type="text" id="serial" placeholder="#001" value="#001">
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="field">
+      <label>POWER STATS</label>
+      <div class="stat-row">
+        <div class="stat-label">⚔️ ATTACK</div>
+        <input type="range" id="attackLevel" min="0" max="100" value="85">
+        <div class="stat-val" id="attackVal">85</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-label">🛡️ DEFENSE</div>
+        <input type="range" id="defenseLevel" min="0" max="100" value="70">
+        <div class="stat-val" id="defenseVal">70</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-label">⚡ SPEED</div>
+        <input type="range" id="speedLevel" min="0" max="100" value="90">
+        <div class="stat-val" id="speedVal">90</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-label">✨ MAGIC</div>
+        <input type="range" id="magicLevel" min="0" max="100" value="75">
+        <div class="stat-val" id="magicVal">75</div>
+      </div>
+    </div>
+
+    <!-- COLORS -->
+    <div class="field">
+      <label>NEON LIGHTNING COLORS — CLICK TO TOGGLE</label>
+      <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+        <button onclick="setPalette('neon')" style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;padding:5px 10px;background:linear-gradient(135deg,#ff00ff,#00ffff);color:#000;border:none;border-radius:6px;cursor:pointer">⚡ NEON</button>
+        <button onclick="setPalette('matrix')" style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;padding:5px 10px;background:linear-gradient(135deg,#00ff00,#003300);color:#fff;border:none;border-radius:6px;cursor:pointer">🟢 MATRIX</button>
+        <button onclick="setPalette('mono')" style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;padding:5px 10px;background:linear-gradient(135deg,#ffffff,#444);color:#000;border:none;border-radius:6px;cursor:pointer">⬜ MONO</button>
+        <button onclick="setPalette('fire')" style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;padding:5px 10px;background:linear-gradient(135deg,#ff1744,#f59e0b);color:#fff;border:none;border-radius:6px;cursor:pointer">🔥 FIRE</button>
+      </div>
+      <div class="colors-grid">
+        <button class="color-btn active" style="background:#00ff00;color:#000" data-color="#00ff00">GREEN</button>
+        <button class="color-btn active" style="background:#00ffff;color:#000" data-color="#00ffff">CYAN</button>
+        <button class="color-btn active" style="background:#ff00ff;color:#000" data-color="#ff00ff">MAGENTA</button>
+        <button class="color-btn active" style="background:#ffff00;color:#000" data-color="#ffff00">YELLOW</button>
+        <button class="color-btn active" style="background:#ff0080;color:#fff" data-color="#ff0080">PINK</button>
+        <button class="color-btn active" style="background:#8000ff;color:#fff" data-color="#8000ff">PURPLE</button>
+        <button class="color-btn active" style="background:#ff1744;color:#fff" data-color="#ff1744">RED</button>
+        <button class="color-btn active" style="background:#00e5ff;color:#000" data-color="#00e5ff">BLUE</button>
+        <button class="color-btn" style="background:#00cc44;color:#000" data-color="#00cc44">LIME</button>
+        <button class="color-btn" style="background:#005500;color:#00ff00;border:1px solid #00ff00" data-color="#005500">D.GREEN</button>
+        <button class="color-btn" style="background:#111;color:#aaa;border:1px solid #333" data-color="#111111">BLACK</button>
+        <button class="color-btn" style="background:#ffffff;color:#000" data-color="#ffffff">WHITE</button>
+      </div>
+    </div>
+
+    <!-- MINT SECTION -->
+    <div style="background:rgba(0,255,68,0.05);border:1px solid rgba(0,255,68,0.2);border-radius:12px;padding:16px;margin-bottom:4px">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:#00cc44;margin-bottom:10px">// MINT ON-CHAIN — MONAD MAINNET</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-family:'Orbitron',monospace;font-size:22px;font-weight:900;color:#00ff44;text-shadow:0 0 16px rgba(0,255,68,0.5)">100 MON</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#666;text-align:right">OWNER:<br><span style="color:#00cc44;font-size:9px">0x592B...560b2e</span></div>
+      </div>
+      <button class="btn" id="mintBtn" onclick="mintOnChain()" style="background:linear-gradient(135deg,#003300,#00aa44);color:#00ff44;box-shadow:0 4px 20px rgba(0,255,68,0.25);border:1px solid rgba(0,255,68,0.3);font-size:13px">🌿 MINT NFT CARD — 100 MON</button>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#444;text-align:center;margin-top:8px">Sends 100 MON to owner wallet · Monad Chain ID 143</div>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="btn-row">
+      <button class="btn btn-generate" onclick="generateCard()">⚡ GENERATE ANIMATED CARD</button>
+      <button class="btn btn-download" id="downloadBtn" onclick="downloadCard()" disabled>💾 DOWNLOAD PNG</button>
+      <button class="btn btn-video" id="videoBtn" onclick="downloadVideo()" disabled>🎬 DOWNLOAD VIDEO (5s)</button>
+    </div>
+
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+
+    <div class="rec-indicator" id="recIndicator">
+      <div class="rec-dot"></div>
+      RECORDING — <span id="recTimer">5</span>s remaining
+    </div>
+
+    <div class="status" id="status">👆 Upload an image to get started</div>
+  </div>
+
+  <!-- CANVAS -->
+  <div class="canvas-panel">
+    <div class="panel">
+      <div class="panel-title">// LIVE PREVIEW</div>
+      <div class="canvas-wrap" id="canvasWrap">
+        <div class="canvas-placeholder" id="placeholder">
+          <div class="icon">🎴</div>
+          Upload an image and click<br>Generate to see your card
+        </div>
+        <canvas id="canvas" style="display:none"></canvas>
+      </div>
+      <div class="preview-info" id="previewInfo" style="display:none">
+        <span id="previewSize">800 × 1200</span>
+        <span id="previewFps">30 FPS</span>
+        <span id="previewStatus">ANIMATING</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── STATE ──
+let img = null;
+let animId = null;
+let time = 0;
+let isAnimating = false;
+let activeColors = ['#00ff00','#00ffff','#ff00ff','#ffff00','#ff0080','#8000ff','#ff1744','#00e5ff'];
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+// ── OWNER / CHAIN CONFIG ──
+const OWNER_ADDRESS = '0x592B35c8917eD36c39Ef73D0F5e92B0173560b2e';
+const MONAD_CHAIN_ID = '0x8F';
+const MINT_PRICE_WEI = '0x' + (BigInt('100000000000000000000')).toString(16);
+
+// ── STATUS HELPER ──
+function setStatus(msg, type='') {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status ' + type;
+}
+
+// ── PALETTE PRESETS ──
+function setPalette(name) {
+  const palettes = {
+    neon:   ['#00ff00','#00ffff','#ff00ff','#ffff00','#ff0080','#8000ff','#ff1744','#00e5ff'],
+    matrix: ['#00ff00','#00cc44','#005500','#00ff44','#44ff88','#00aa33','#003300','#ffffff'],
+    mono:   ['#ffffff','#cccccc','#888888','#444444','#ffffff','#aaaaaa','#333333','#111111'],
+    fire:   ['#ff1744','#ff6600','#f59e0b','#ffff00','#ff4400','#cc2200','#ffaa00','#ff0080'],
+  };
+  const cols = palettes[name] || palettes.neon;
+  document.querySelectorAll('.color-btn').forEach(btn => {
+    btn.classList.toggle('active', cols.includes(btn.dataset.color));
+  });
+  activeColors = [...cols];
+}
+
+// ── MINT ON-CHAIN ──
+async function mintOnChain() {
+  if (!window.ethereum) {
+    setStatus('❌ No wallet found — install MetaMask or Rabby', 'err');
+    return;
+  }
+  const btn = document.getElementById('mintBtn');
+  btn.disabled = true;
+  try {
+    setStatus('🔗 Connecting wallet...', 'active');
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const account = accounts[0];
+    try {
+      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: MONAD_CHAIN_ID }] });
+    } catch(e) {
+      if (e.code === 4902 || e.code === -32603) {
+        await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{
+          chainId: MONAD_CHAIN_ID, chainName: 'Monad Mainnet',
+          nativeCurrency: { name:'MON', symbol:'MON', decimals:18 },
+          rpcUrls: ['https://rpc.monad.xyz'],
+          blockExplorerUrls: ['https://explorer.monad.xyz']
+        }]});
+      }
+    }
+    setStatus('💸 Sending 100 MON — confirm in wallet...', 'active');
+    const txHash = await window.ethereum.request({
+      method: 'eth_sendTransaction',
+      params: [{ from: account, to: OWNER_ADDRESS, value: MINT_PRICE_WEI, gas: '0x5208' }]
+    });
+    setStatus('⏳ Confirming transaction...', 'active');
+    const receipt = await new Promise((resolve, reject) => {
+      let attempts = 0;
+      const poll = setInterval(async () => {
+        if (++attempts > 60) { clearInterval(poll); reject(new Error('Timeout')); return; }
+        try {
+          const r = await fetch('https://rpc.monad.xyz', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ jsonrpc:'2.0', id:1, method:'eth_getTransactionReceipt', params:[txHash] })
+          });
+          const j = await r.json();
+          if (j.result) { clearInterval(poll); resolve(j.result); }
+        } catch(e) {}
+      }, 2000);
+    });
+    if (receipt.status === '0x1') {
+      setStatus('✅ MINTED! TX: ' + txHash.slice(0,14) + '...', 'ok');
+      setTimeout(() => downloadCard(), 600);
+    } else {
+      setStatus('❌ Transaction reverted', 'err');
+    }
+  } catch(e) {
+    if (e.code === 4001) setStatus('❌ Rejected by user', 'err');
+    else setStatus('❌ ' + (e.message || 'Mint failed'), 'err');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ── COLOR TOGGLES ──
+document.querySelectorAll('.color-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.classList.toggle('active');
+    activeColors = [...document.querySelectorAll('.color-btn.active')].map(b => b.dataset.color);
+    if (activeColors.length === 0) {
+      activeColors = ['#ffffff'];
+      btn.classList.add('active'); // keep at least one
+    }
+    if (isAnimating) drawCard(); // live update
+  });
+});
+
+// ── STAT SLIDERS ──
+['attack','defense','speed','magic'].forEach(s => {
+  const input = document.getElementById(s + 'Level');
+  const val = document.getElementById(s + 'Val');
+  input.addEventListener('input', () => {
+    val.textContent = input.value;
+    // No redraw needed — animation loop handles it
+  });
+});
+
+// ── LIVE REDRAW on input changes ──
+['nftName','rarityGrade','edition','serial'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    // animation loop picks up changes automatically
+  });
+});
+
+// ── UPLOAD ──
+const uploadZone = document.getElementById('uploadZone');
+const imageInput = document.getElementById('imageInput');
+
+// Drag and drop
+uploadZone.addEventListener('dragover', e => {
+  e.preventDefault();
+  uploadZone.classList.add('drag');
+});
+
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag'));
+
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) loadImage(file);
+});
+
+imageInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (file) loadImage(file);
+});
+
+function loadImage(file) {
+  setStatus('📥 Loading image...', 'active');
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const i = new Image();
+    i.onload = () => {
+      img = i;
+      document.getElementById('uploadIcon').textContent = '✅';
+      document.getElementById('uploadText').innerHTML = `<strong>${file.name}</strong><br>${i.width}×${i.height}px`;
+      setStatus('✅ Image loaded — click Generate Card!', 'ok');
+      generateCard();
+    };
+    i.onerror = () => setStatus('❌ Failed to load image', 'err');
+    i.src = ev.target.result;
+  };
+  reader.onerror = () => setStatus('❌ Failed to read file', 'err');
+  reader.readAsDataURL(file);
+}
+
+// ── GENERATE ──
+function generateCard() {
+  if (!img) {
+    setStatus('⚠️ Please upload an image first!', 'err');
+    return;
+  }
+
+  // Show canvas
+  document.getElementById('placeholder').style.display = 'none';
+  canvas.style.display = 'block';
+  document.getElementById('previewInfo').style.display = 'flex';
+
+  // Enable buttons
+  document.getElementById('downloadBtn').disabled = false;
+  document.getElementById('videoBtn').disabled = false;
+
+  // Start animation
+  if (animId) cancelAnimationFrame(animId);
+  time = 0;
+  isAnimating = true;
+  animate();
+  setStatus('✨ Card generating — fully animated!', 'ok');
+}
+
+let lastTime = 0;
+let fps = 0;
+let frameCount = 0;
+let fpsTimer = 0;
+
+function animate(ts = 0) {
+  if (!isAnimating) return;
+
+  const dt = ts - lastTime;
+  lastTime = ts;
+
+  // FPS counter
+  frameCount++;
+  fpsTimer += dt;
+  if (fpsTimer >= 1000) {
+    fps = frameCount;
+    frameCount = 0;
+    fpsTimer = 0;
+    document.getElementById('previewFps').textContent = fps + ' FPS';
+  }
+
+  time += 0.025;
+  drawCard();
+  animId = requestAnimationFrame(animate);
+}
+
+// ── DRAW CARD ──
+function drawCard() {
+  const name     = document.getElementById('nftName').value || 'NFT #001';
+  const rarityRaw = document.getElementById('rarityGrade').value;
+  const [grade, colorStr, icon, rarityName] = rarityRaw.split('|');
+  const rarityColors = colorStr.split(',');
+  const attack   = parseInt(document.getElementById('attackLevel').value);
+  const defense  = parseInt(document.getElementById('defenseLevel').value);
+  const speed    = parseInt(document.getElementById('speedLevel').value);
+  const magic    = parseInt(document.getElementById('magicLevel').value);
+  const edition  = document.getElementById('edition').value;
+  const serial   = document.getElementById('serial').value;
+  const cols     = activeColors.length > 0 ? activeColors : ['#ffffff'];
+
+  canvas.width  = 800;
+  canvas.height = 1200;
+
+  // ── BACKGROUND ──
+  const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  bg.addColorStop(0, '#08051a');
+  bg.addColorStop(0.5, '#0d0820');
+  bg.addColorStop(1, '#050510');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // ── AMBIENT ORBS ──
+  for (let i = 0; i < 6; i++) {
+    const angle = time * 0.8 + (i * Math.PI * 2 / 6);
+    const r = 220 + Math.sin(time * 2 + i) * 60;
+    const x = canvas.width / 2 + Math.cos(angle) * r;
+    const y = canvas.height / 2 + Math.sin(angle) * r * 0.6;
+    const col = cols[i % cols.length];
+    const grd = ctx.createRadialGradient(x, y, 0, x, y, 80);
+    grd.addColorStop(0, col + '44');
+    grd.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.arc(x, y, 80, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // ── OUTER BORDER (animated) ──
+  const borderCol = cols[Math.floor(time * 1.5) % cols.length];
+  ctx.save();
+  ctx.strokeStyle = borderCol;
+  ctx.lineWidth = 6;
+  ctx.shadowColor = borderCol;
+  ctx.shadowBlur = 24;
+  roundRect(ctx, 16, 16, canvas.width - 32, canvas.height - 32, 20);
+  ctx.stroke();
+  ctx.restore();
+
+  // Corner accents
+  drawCornerAccents(borderCol);
+
+  // ── IMAGE AREA ──
+  const imgX = 40, imgY = 56, imgW = canvas.width - 80, imgH = 560;
+
+  ctx.save();
+  ctx.shadowColor = borderCol;
+  ctx.shadowBlur = 16;
+  ctx.strokeStyle = borderCol;
+  ctx.lineWidth = 3;
+  roundRect(ctx, imgX - 2, imgY - 2, imgW + 4, imgH + 4, 14);
+  ctx.stroke();
+  ctx.restore();
+
+  // Image clipped
+  ctx.save();
+  roundRect(ctx, imgX, imgY, imgW, imgH, 12);
+  ctx.clip();
+
+  // Draw image scaled to fill
+  const scale = Math.max(imgW / img.width, imgH / img.height);
+  const sw = img.width * scale;
+  const sh = img.height * scale;
+  const sx = imgX + (imgW - sw) / 2;
+  const sy = imgY + (imgH - sh) / 2;
+  ctx.drawImage(img, sx, sy, sw, sh);
+
+  // Overlay shimmer
+  const shimX = ((time * 120) % (imgW + 200)) - 100;
+  const shimGrd = ctx.createLinearGradient(imgX + shimX, 0, imgX + shimX + 100, 0);
+  shimGrd.addColorStop(0, 'transparent');
+  shimGrd.addColorStop(0.5, 'rgba(255,255,255,0.08)');
+  shimGrd.addColorStop(1, 'transparent');
+  ctx.fillStyle = shimGrd;
+  ctx.fillRect(imgX, imgY, imgW, imgH);
+
+  // Color tint pulse
+  ctx.globalCompositeOperation = 'screen';
+  ctx.fillStyle = cols[Math.floor(time * 0.5) % cols.length] + '18';
+  ctx.fillRect(imgX, imgY, imgW, imgH);
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.restore();
+
+  // ── FLOATING ICONS ──
+  const floatIcons = ['⭐','💎','⚡','✨','🔥','💫'];
+  for (let i = 0; i < 8; i++) {
+    const angle = time * 1.2 + i * 0.785;
+    const r = 220 + Math.sin(time * 2.5 + i * 1.3) * 40;
+    const x = imgX + imgW / 2 + Math.cos(angle) * (r * 0.52);
+    const y = imgY + imgH / 2 + Math.sin(angle) * (r * 0.34);
+    const sz = 20 + Math.sin(time * 3 + i) * 5;
+    ctx.save();
+    ctx.shadowColor = cols[i % cols.length];
+    ctx.shadowBlur = 18;
+    ctx.font = `${sz}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.globalAlpha = 0.7 + Math.sin(time * 2 + i) * 0.3;
+    ctx.fillText(floatIcons[i % floatIcons.length], x, y);
+    ctx.restore();
+  }
+
+  // ── RARITY BADGE ──
+  const badgeY = imgY + imgH - 50;
+  const pulse = Math.sin(time * 3) * 10;
+  const rGrd = ctx.createLinearGradient(canvas.width / 2 - 140, 0, canvas.width / 2 + 140, 0);
+  rarityColors.forEach((c, i) => rGrd.addColorStop(i / (rarityColors.length - 1), c));
+
+  ctx.save();
+  ctx.shadowColor = rarityColors[0];
+  ctx.shadowBlur = 20 + pulse;
+  ctx.fillStyle = 'rgba(0,0,0,0.92)';
+  roundRect(ctx, canvas.width / 2 - 140, badgeY - 26, 280, 52, 26);
+  ctx.fill();
+  ctx.strokeStyle = rGrd;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  ctx.font = 'bold 30px Arial';
+  ctx.fillStyle = rGrd;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowBlur = 30;
+  ctx.fillText(`${icon} ${grade} ${icon}`, canvas.width / 2, badgeY);
+  ctx.restore();
+
+  // ── NAME PANEL ──
+  const nameY = imgY + imgH + 20;
+  ctx.fillStyle = 'rgba(0,0,0,0.88)';
+  ctx.save();
+  roundRect(ctx, 40, nameY, canvas.width - 80, 70, 10);
+  ctx.fill();
+  ctx.restore();
+
+  // Name text
+  const nameCol = cols[Math.floor(time * 1.2) % cols.length];
+  ctx.save();
+  ctx.shadowColor = nameCol;
+  ctx.shadowBlur = 14;
+  ctx.fillStyle = nameCol;
+  ctx.font = 'bold 26px Orbitron, monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  // Truncate if too long
+  let displayName = name;
+  ctx.font = 'bold 26px monospace';
+  while (ctx.measureText(displayName).width > canvas.width - 200 && displayName.length > 3) {
+    displayName = displayName.slice(0, -1);
+  }
+  ctx.fillText(displayName, 60, nameY + 25);
+  ctx.restore();
+
+  // Serial
+  ctx.save();
+  ctx.fillStyle = '#888';
+  ctx.font = '18px monospace';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(serial, canvas.width - 60, nameY + 25);
+  ctx.restore();
+
+  // Edition
+  ctx.save();
+  ctx.fillStyle = '#555';
+  ctx.font = '14px monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(`EDITION ${edition}`, canvas.width / 2, nameY + 55);
+  ctx.restore();
+
+  // ── STAT BARS ──
+  const statsY = nameY + 85;
+  const stats = [
+    { label:'ATTACK',  val:attack,  icon:'⚔️' },
+    { label:'DEFENSE', val:defense, icon:'🛡️' },
+    { label:'SPEED',   val:speed,   icon:'⚡' },
+    { label:'MAGIC',   val:magic,   icon:'✨' },
+  ];
+
+  stats.forEach((s, i) => drawStatBar(s, statsY + i * 78, cols, time));
+
+  // ── BOTTOM WATERMARK ──
+  ctx.save();
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.font = '11px monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('NFT CARD GENERATOR PRO · imperamonad.xyz', canvas.width / 2, canvas.height - 22);
+  ctx.restore();
+}
+
+function drawStatBar(stat, y, cols, t) {
+  const x = 50;
+  const w = canvas.width - 100;
+  const h = 22;
+  const fill = Math.max(0, Math.min(1, stat.val / 100)) * w;
+
+  // Label
+  const lCol = cols[Math.floor(t * 1.5) % cols.length];
+  ctx.save();
+  ctx.fillStyle = lCol;
+  ctx.shadowColor = lCol;
+  ctx.shadowBlur = 8;
+  ctx.font = 'bold 15px monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText(`${stat.icon} ${stat.label}`, x, y - 4);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#ccc';
+  ctx.shadowBlur = 0;
+  ctx.fillText(`${stat.val}/100`, x + w, y - 4);
+  ctx.restore();
+
+  // Track
+  ctx.save();
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  roundRect(ctx, x, y, w, h, h / 2);
+  ctx.fill();
+
+  // Fill
+  if (fill > 0) {
+    const barGrd = ctx.createLinearGradient(x, 0, x + fill, 0);
+    for (let i = 0; i < 3; i++) barGrd.addColorStop(i / 2, cols[(Math.floor(t * 2) + i) % cols.length]);
+    ctx.fillStyle = barGrd;
+    ctx.shadowColor = cols[Math.floor(t) % cols.length];
+    ctx.shadowBlur = 12;
+    roundRect(ctx, x, y, fill, h, h / 2);
+    ctx.fill();
+
+    // Shimmer on bar
+    const shimPos = ((t * 180) % (fill + 80)) - 40;
+    const sg = ctx.createLinearGradient(x + shimPos, 0, x + shimPos + 60, 0);
+    sg.addColorStop(0, 'transparent');
+    sg.addColorStop(0.5, 'rgba(255,255,255,0.5)');
+    sg.addColorStop(1, 'transparent');
+    ctx.fillStyle = sg;
+    ctx.shadowBlur = 0;
+    roundRect(ctx, x, y, fill, h, h / 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawCornerAccents(col) {
+  const size = 30;
+  const pad = 16;
+  const corners = [
+    [pad, pad, 0, 0],
+    [canvas.width - pad, pad, Math.PI / 2, 0],
+    [canvas.width - pad, canvas.height - pad, Math.PI, 0],
+    [pad, canvas.height - pad, -Math.PI / 2, 0],
+  ];
+  ctx.save();
+  ctx.strokeStyle = col;
+  ctx.lineWidth = 3;
+  ctx.shadowColor = col;
+  ctx.shadowBlur = 12;
+  corners.forEach(([x, y, rot]) => {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rot);
+    ctx.beginPath();
+    ctx.moveTo(0, size);
+    ctx.lineTo(0, 0);
+    ctx.lineTo(size, 0);
+    ctx.stroke();
+    ctx.restore();
+  });
+  ctx.restore();
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+// ── DOWNLOAD PNG ──
+function downloadCard() {
+  if (!img) { setStatus('❌ Generate a card first!', 'err'); return; }
+
+  setStatus('💾 Preparing PNG download...', 'active');
+  const wasAnim = isAnimating;
+  isAnimating = false;
+  if (animId) cancelAnimationFrame(animId);
+
+  setTimeout(() => {
+    drawCard();
+    canvas.toBlob(blob => {
+      if (!blob) { setStatus('❌ Failed to create PNG', 'err'); return; }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const name = (document.getElementById('nftName').value || 'nft-card').replace(/[^a-z0-9]/gi, '-').toLowerCase();
+      a.download = `${name}.png`;
+      a.href = url;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setStatus('✅ PNG downloaded successfully!', 'ok');
+
+      if (wasAnim) {
+        isAnimating = true;
+        animate();
+      }
+    }, 'image/png');
+  }, 100);
+}
+
+// ── DOWNLOAD VIDEO ──
+function downloadVideo() {
+  if (!img) { setStatus('❌ Generate a card first!', 'err'); return; }
+
+  // Check support
+  if (!canvas.captureStream) {
+    setStatus('❌ Video not supported — use Chrome or Firefox', 'err');
+    return;
+  }
+
+  // Check MediaRecorder support
+  const mimeTypes = [
+    'video/webm;codecs=vp9',
+    'video/webm;codecs=vp8',
+    'video/webm',
+    'video/mp4',
+  ];
+
+  let mimeType = '';
+  for (const type of mimeTypes) {
+    if (MediaRecorder.isTypeSupported(type)) {
+      mimeType = type;
+      break;
+    }
+  }
+
+  if (!mimeType) {
+    setStatus('❌ Video recording not supported in this browser', 'err');
+    return;
+  }
+
+  document.getElementById('videoBtn').disabled = true;
+  document.getElementById('downloadBtn').disabled = true;
+
+  // Make sure animation is running
+  if (!isAnimating) {
+    isAnimating = true;
+    animate();
+  }
+
+  // Show recording indicator
+  const recIndicator = document.getElementById('recIndicator');
+  recIndicator.classList.add('show');
+  const recTimer = document.getElementById('recTimer');
+
+  // Progress bar
+  const progressWrap = document.getElementById('progressWrap');
+  const progressFill = document.getElementById('progressFill');
+  progressWrap.classList.add('show');
+  progressFill.style.width = '0%';
+
+  setStatus('🎬 Recording 5s video...', 'active');
+
+  try {
+    const stream = canvas.captureStream(30);
+    const recorder = new MediaRecorder(stream, {
+      mimeType,
+      videoBitsPerSecond: 8000000,
+    });
+
+    const chunks = [];
+    recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+
+    recorder.onerror = e => {
+      setStatus('❌ Recording error: ' + e.error, 'err');
+      cleanup();
+    };
+
+    recorder.onstop = () => {
+      if (chunks.length === 0) {
+        setStatus('❌ No video data captured', 'err');
+        cleanup();
+        return;
+      }
+      const blob = new Blob(chunks, { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const name = (document.getElementById('nftName').value || 'nft-card').replace(/[^a-z0-9]/gi, '-').toLowerCase();
+      const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+      a.download = `${name}-animated.${ext}`;
+      a.href = url;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setStatus(`✅ Video downloaded! (${ext.toUpperCase()}, 5 seconds)`, 'ok');
+      cleanup();
+    };
+
+    recorder.start(100); // collect data every 100ms
+
+    // Countdown
+    let remaining = 5;
+    const countdown = setInterval(() => {
+      remaining--;
+      recTimer.textContent = remaining;
+      progressFill.style.width = ((5 - remaining) / 5 * 100) + '%';
+      if (remaining <= 0) clearInterval(countdown);
+    }, 1000);
+
+    setTimeout(() => {
+      clearInterval(countdown);
+      progressFill.style.width = '100%';
+      if (recorder.state !== 'inactive') recorder.stop();
+    }, 5000);
+
+  } catch(e) {
+    setStatus('❌ Recording failed: ' + e.message, 'err');
+    cleanup();
+  }
+
+  function cleanup() {
+    recIndicator.classList.remove('show');
+    progressWrap.classList.remove('show');
+    progressFill.style.width = '0%';
+    document.getElementById('videoBtn').disabled = false;
+    document.getElementById('downloadBtn').disabled = false;
+  }
+}
+
+// ── UPDATE PREVIEW SIZE ──
+function updatePreviewSize() {
+  document.getElementById('previewSize').textContent = '800 × 1200';
+  document.getElementById('previewStatus').textContent = isAnimating ? 'LIVE🔥' : 'PAUSED';
+}
+setInterval(updatePreviewSize, 500);
+
+// ── VIBRATE ON CLICK — ALL BUTTONS ──
+document.addEventListener('click', e => {
+  const btn = e.target.closest('button, .color-btn, .upload-zone');
+  if (!btn || btn.disabled) return;
+  btn.classList.remove('vibrating');
+  void btn.offsetWidth; // force reflow to restart animation
+  btn.classList.add('vibrating');
+  btn.addEventListener('animationend', () => btn.classList.remove('vibrating'), { once: true });
+});
+</script>
+</body>
+</html>
