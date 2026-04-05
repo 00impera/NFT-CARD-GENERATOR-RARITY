@@ -192,7 +192,7 @@ open index.html
 
 # OR deploy to GitHub Pages
 # Settings → Pages → Branch: main → / (root) → Save
-# Live at: https://00impera.github.io/NFT-CARD-GENERATOR-PRO/
+# Live at: https://nftgeneratornft.nelutz2you.workers.dev/
 ```
 
 ---
@@ -224,18 +224,8 @@ const MINT_PRICE_WEI = '0x' + BigInt('50000000000000000000').toString(16);
 | Mobile Chrome | ✅ | ✅ | ✅ | ✅ |
 | Mobile Safari | ✅ | ✅ | ❌ | ✅ |
 
----
 
-## 🔗 Related Projects
 
-| Project | URL |
-|---|---|
-| PYRATHOS Mining | [pyrathos.imperamonad.xyz](https://pyrathos.imperamonad.xyz) |
-| Quantum Engine NFT | [quantum-engine.imperamonad.xyz](https://quantum-engine.imperamonad.xyz) |
-| IceBox Mint | [icebox.imperamonad.xyz](https://icebox.imperamonad.xyz) |
-| Portfolio | [imperamonad.xyz](https://imperamonad.xyz) |
-
----
 
 ## 📄 License
 
