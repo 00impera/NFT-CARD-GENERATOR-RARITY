@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>NFT CARD GENERATOR PRO</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<!-- thirdweb SDK (CDN) — client ID only, never secret key in frontend -->
-<script src="https://unpkg.com/thirdweb@latest/dist/browser/thirdweb.umd.js"></script>
 <style>
 :root {
   --bg: #04060f;
@@ -501,15 +499,6 @@ input[type="range"]::-webkit-slider-thumb {
 </div>
 
 <script>
-// ── THIRDWEB CONFIG ── (client ID only — secret key NEVER goes in frontend)
-const THIRDWEB_CLIENT_ID = '39d5688409d060364e2d612723c14984';
-let twClient = null;
-try {
-  if (window.thirdweb && window.thirdweb.createThirdwebClient) {
-    twClient = window.thirdweb.createThirdwebClient({ clientId: THIRDWEB_CLIENT_ID });
-  }
-} catch(e) { console.warn('thirdweb SDK not loaded:', e); }
-
 // ── STATE ──
 let img = null;
 let animId = null;
@@ -523,7 +512,7 @@ const ctx = canvas.getContext('2d');
 
 // ── CHAIN CONFIG ──
 const OWNER_ADDRESS  = '0x592B35c8917eD36c39Ef73D0F5e92B0173560b2e';
-const MONAD_CHAIN_ID = '0x8F'; // 143 decimal
+const MONAD_CHAIN_ID = '0x8F'; // 143 decimal = Monad Mainnet
 const MINT_PRICE_WEI = '0x' + (BigInt('100000000000000000000')).toString(16); // 100 MON
 
 // ── STATUS HELPER ──
@@ -533,14 +522,29 @@ function setStatus(msg, type='') {
   el.className = 'status ' + type;
 }
 
+// ── GET PROVIDER: supports MetaMask, Rabby, Coinbase, WalletConnect injected ──
+function getProvider() {
+  // Multi-wallet support: check window.ethereum providers array first
+  if (window.ethereum?.providers?.length) {
+    // Prefer MetaMask if multiple providers exist
+    const mm = window.ethereum.providers.find(p => p.isMetaMask);
+    if (mm) return mm;
+    return window.ethereum.providers[0];
+  }
+  if (window.ethereum) return window.ethereum;
+  // Rabby / other injected
+  if (window.rabby) return window.rabby;
+  return null;
+}
+
 // ── WALLET HELPERS ──
 function shortAddr(addr) {
   return addr ? addr.slice(0,6) + '...' + addr.slice(-4) : '';
 }
 
 function updateWalletUI() {
-  const addrEl  = document.getElementById('walletAddr');
-  const btnEl   = document.getElementById('connectWalletBtn');
+  const addrEl = document.getElementById('walletAddr');
+  const btnEl  = document.getElementById('connectWalletBtn');
   if (connectedAccount) {
     addrEl.textContent = '🟢 ' + shortAddr(connectedAccount);
     btnEl.textContent  = '🔌 DISCONNECT';
@@ -563,31 +567,58 @@ async function toggleWallet() {
 }
 
 async function connectWallet() {
-  if (!window.ethereum) {
-    setStatus('❌ No wallet detected — install MetaMask or Rabby', 'err');
+  const provider = getProvider();
+  if (!provider) {
+    setStatus('❌ No wallet found — install MetaMask or Rabby', 'err');
+    window.open('https://metamask.io/download/', '_blank');
     return null;
   }
   try {
     setStatus('🔗 Connecting wallet...', 'active');
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    // Request accounts — works for MetaMask, Rabby, Coinbase Wallet etc.
+    const accounts = await provider.request({ method: 'eth_requestAccounts' });
+    if (!accounts || accounts.length === 0) {
+      setStatus('❌ No accounts found in wallet', 'err');
+      return null;
+    }
     connectedAccount = accounts[0];
     updateWalletUI();
-    setStatus('✅ Wallet connected: ' + shortAddr(connectedAccount), 'ok');
+    setStatus('✅ Connected: ' + shortAddr(connectedAccount), 'ok');
+
+    // Setup listeners on the active provider
+    provider.on?.('accountsChanged', (accs) => {
+      connectedAccount = accs[0] || null;
+      updateWalletUI();
+      if (!connectedAccount) setStatus('⚠️ Wallet disconnected', '');
+    });
+    provider.on?.('chainChanged', () => window.location.reload());
+    provider.on?.('disconnect', () => {
+      connectedAccount = null;
+      updateWalletUI();
+      setStatus('⚠️ Wallet disconnected', '');
+    });
+
     return connectedAccount;
   } catch(e) {
-    if (e.code === 4001) setStatus('❌ Connection rejected', 'err');
-    else setStatus('❌ ' + (e.message || 'Wallet error'), 'err');
+    if (e.code === 4001) setStatus('❌ Connection rejected by user', 'err');
+    else if (e.code === -32002) setStatus('⏳ Check your wallet — request pending', 'active');
+    else setStatus('❌ ' + (e.message || 'Wallet connection failed'), 'err');
     return null;
   }
 }
 
-// Listen for account changes
-if (window.ethereum) {
-  window.ethereum.on('accountsChanged', (accounts) => {
-    connectedAccount = accounts[0] || null;
-    updateWalletUI();
-  });
-  window.ethereum.on('chainChanged', () => window.location.reload());
+// Auto-detect if already connected on page load
+async function checkExistingConnection() {
+  const provider = getProvider();
+  if (!provider) return;
+  try {
+    const accounts = await provider.request({ method: 'eth_accounts' }); // non-invasive, no popup
+    if (accounts && accounts.length > 0) {
+      connectedAccount = accounts[0];
+      updateWalletUI();
+      setStatus('✅ Wallet auto-connected: ' + shortAddr(connectedAccount), 'ok');
+    }
+  } catch(e) { /* silent fail */ }
 }
 
 // ── PALETTE PRESETS ──
@@ -608,8 +639,10 @@ function setPalette(name) {
 
 // ── MINT ON-CHAIN ──
 async function mintOnChain() {
-  if (!window.ethereum) {
+  const provider = getProvider();
+  if (!provider) {
     setStatus('❌ No wallet found — install MetaMask or Rabby', 'err');
+    window.open('https://metamask.io/download/', '_blank');
     return;
   }
   const btn = document.getElementById('mintBtn');
@@ -623,10 +656,10 @@ async function mintOnChain() {
 
     // Switch to Monad chain
     try {
-      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: MONAD_CHAIN_ID }] });
+      await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: MONAD_CHAIN_ID }] });
     } catch(e) {
-      if (e.code === 4902 || e.code === -32603) {
-        await window.ethereum.request({
+      if (e.code === 4902 || e.code === -32603 || e.code === -32601) {
+        await provider.request({
           method: 'wallet_addEthereumChain',
           params: [{
             chainId: MONAD_CHAIN_ID, chainName: 'Monad Mainnet',
@@ -641,7 +674,7 @@ async function mintOnChain() {
     }
 
     setStatus('💸 Confirm payment of 100 MON in wallet...', 'active');
-    const txHash = await window.ethereum.request({
+    const txHash = await provider.request({
       method: 'eth_sendTransaction',
       params: [{ from: connectedAccount, to: OWNER_ADDRESS, value: MINT_PRICE_WEI, gas: '0x5208' }]
     });
@@ -1087,8 +1120,9 @@ document.addEventListener('touchend', e => {
   setTimeout(() => { btn._touchHandled = false; }, 600);
 }, { passive: true });
 
-// Init wallet UI
+// Init wallet UI + auto-detect existing connection
 updateWalletUI();
+checkExistingConnection();
 </script>
 </body>
 </html>
