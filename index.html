@@ -5,27 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>NFT CARD GENERATOR PRO</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<!-- thirdweb SDK (CDN) — client ID only, never secret key in frontend -->
+<script src="https://unpkg.com/thirdweb@latest/dist/browser/thirdweb.umd.js"></script>
 <style>
 :root {
-  --bg: #050500;
-  --panel: rgba(8,6,0,0.97);
-  --border: rgba(255,80,0,0.22);
-  --accent: #ff4400;
-  --accent2: #ff8800;
-  --gold: #ffcc00;
-  --text: #ffd0a0;
-  --dim: #7a4a20;
+  --bg: #04060f;
+  --panel: rgba(6,10,26,0.98);
+  --border: rgba(0,229,255,0.22);
+  --accent: #00e5ff;
+  --accent2: #00ff88;
+  --gold: #1affd5;
+  --text: #e0f7fa;
+  --dim: #1a6a7a;
   --success: #00ff88;
   --danger: #ff2244;
-  --flame1: #ff2200;
-  --flame2: #ff6600;
-  --flame3: #ffaa00;
-  --flame4: #ffee00;
+  --flame1: #00e5ff;
+  --flame2: #00ff88;
+  --flame3: #1affd5;
+  --flame4: #00ccff;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
 
-/* ── VIBRATE ON CLICK ── */
 @keyframes vibrate {
   0%   { transform: translate(0,0) rotate(0deg) scale(1); }
   10%  { transform: translate(-3px,2px) rotate(-1deg) scale(1.02); }
@@ -39,10 +40,7 @@
   90%  { transform: translate(-2px,1px) rotate(-0.3deg) scale(1); }
   100% { transform: translate(0,0) rotate(0deg) scale(1); }
 }
-
-.vibrating {
-  animation: vibrate 0.4s cubic-bezier(0.36,0.07,0.19,0.97) !important;
-}
+.vibrating { animation: vibrate 0.4s cubic-bezier(0.36,0.07,0.19,0.97) !important; }
 
 body {
   background: var(--bg);
@@ -53,50 +51,40 @@ body {
   cursor: default;
 }
 
-/* ── FLAME BACKGROUND ── */
 body::before {
   content:'';
   position:fixed; inset:0;
   background:
-    radial-gradient(ellipse at 15% 100%, rgba(255,34,0,0.22) 0%, transparent 50%),
-    radial-gradient(ellipse at 85% 100%, rgba(255,100,0,0.18) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 80%, rgba(255,170,0,0.12) 0%, transparent 45%),
-    radial-gradient(ellipse at 30% 60%, rgba(255,50,0,0.08) 0%, transparent 40%),
-    radial-gradient(ellipse at 70% 40%, rgba(200,30,0,0.06) 0%, transparent 40%);
+    radial-gradient(ellipse at 15% 100%, rgba(0,229,255,0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 100%, rgba(0,255,136,0.14) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(26,255,213,0.10) 0%, transparent 45%),
+    radial-gradient(ellipse at 30% 60%, rgba(0,180,255,0.07) 0%, transparent 40%),
+    radial-gradient(ellipse at 70% 40%, rgba(0,120,200,0.05) 0%, transparent 40%);
   pointer-events:none; z-index:0;
   animation: flamePulse 4s ease-in-out infinite alternate;
 }
-
 @keyframes flamePulse {
   0%   { opacity:0.7; transform:scaleY(1); }
   50%  { opacity:1;   transform:scaleY(1.04); }
   100% { opacity:0.8; transform:scaleY(0.97); }
 }
 
-/* ── EMBER GRID ── */
 body::after {
   content:'';
   position:fixed; inset:0;
   background-image:
-    linear-gradient(rgba(255,80,0,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,80,0,0.04) 1px, transparent 1px);
+    linear-gradient(rgba(0,229,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,0.05) 1px, transparent 1px);
   background-size:36px 36px;
   pointer-events:none; z-index:0;
 }
 
-/* ── FLAME PARTICLES (CSS only) ── */
-.flame-layer {
-  position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
-}
+.flame-layer { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
 .ember {
-  position:absolute;
-  bottom:-10px;
-  width:4px; height:4px;
-  border-radius:50%;
-  background:var(--flame2);
+  position:absolute; bottom:-10px; width:4px; height:4px;
+  border-radius:50%; background:var(--flame2);
   box-shadow:0 0 6px var(--flame1), 0 0 12px var(--flame2);
-  animation: riseEmber linear infinite;
-  opacity:0;
+  animation: riseEmber linear infinite; opacity:0;
 }
 .ember:nth-child(1)  { left:5%;  width:3px;height:3px; animation-duration:3.2s; animation-delay:0s;    background:var(--flame1); }
 .ember:nth-child(2)  { left:12%; width:5px;height:5px; animation-duration:2.8s; animation-delay:0.4s;  background:var(--flame3); }
@@ -125,8 +113,7 @@ body::after {
 
 .wrap {
   position:relative; z-index:1;
-  max-width:1200px;
-  margin:0 auto;
+  max-width:1200px; margin:0 auto;
   padding:24px 16px;
   display:grid;
   grid-template-columns:420px 1fr;
@@ -134,409 +121,211 @@ body::after {
   align-items:start;
 }
 
-/* HEADER */
-.header {
-  grid-column:1/-1;
-  text-align:center;
-  padding:24px 0 8px;
-}
-
+.header { grid-column:1/-1; text-align:center; padding:24px 0 8px; }
 .header h1 {
   font-family:'Orbitron',monospace;
   font-size:clamp(22px,4vw,42px);
-  font-weight:900;
-  letter-spacing:6px;
-  background:linear-gradient(90deg,#ff2200,#ff6600,#ffaa00,#ffee00,#ff6600,#ff2200);
+  font-weight:900; letter-spacing:6px;
+  background:linear-gradient(90deg,#00e5ff,#00ff88,#1affd5,#00ffff,#00ff88,#00e5ff);
   background-size:200% auto;
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  background-clip:text;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
   animation:flameText 3s linear infinite;
-  filter:drop-shadow(0 0 20px rgba(255,80,0,0.6));
+  filter:drop-shadow(0 0 20px rgba(0,229,255,0.6));
 }
-
 @keyframes flameText {
   0%   { background-position:0% center; }
   100% { background-position:200% center; }
 }
+.header p { font-family:'Share Tech Mono',monospace; font-size:11px; color:#1a6a7a; letter-spacing:3px; margin-top:6px; }
 
-.header p {
-  font-family:'Share Tech Mono',monospace;
-  font-size:11px;
-  color:#7a4a20;
-  letter-spacing:3px;
-  margin-top:6px;
-}
-
-/* PANEL */
 .panel {
   background:rgba(8,4,0,0.97);
-  border:1px solid rgba(255,80,0,0.2);
-  border-radius:16px;
-  padding:24px;
-  position:relative;
-  backdrop-filter:blur(20px);
-  box-shadow:0 4px 40px rgba(255,50,0,0.08), inset 0 0 40px rgba(0,0,0,0.5);
+  border:1px solid rgba(0,229,255,0.18);
+  border-radius:16px; padding:24px;
+  position:relative; backdrop-filter:blur(20px);
+  box-shadow:0 4px 40px rgba(0,229,255,0.08), 0 0 0 1px rgba(0,255,136,0.04), inset 0 0 40px rgba(0,0,0,0.6);
 }
-
 .panel::before {
-  content:'';
-  position:absolute;
-  top:0; left:0; right:0; height:1px;
-  background:linear-gradient(90deg,transparent,#ff4400,#ff8800,#ff4400,transparent);
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,#00e5ff,#00ff88,#00e5ff,transparent);
   border-radius:16px 16px 0 0;
   animation:flameLine 2s ease-in-out infinite alternate;
 }
-
 @keyframes flameLine {
   0%   { opacity:0.5; }
-  100% { opacity:1; box-shadow:0 0 8px #ff4400; }
+  100% { opacity:1; box-shadow:0 0 8px #00e5ff; }
 }
 
 .panel-title {
-  font-family:'Orbitron',monospace;
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:3px;
-  color:#7a4a20;
-  margin-bottom:20px;
-  padding-bottom:12px;
-  border-bottom:1px solid rgba(255,80,0,0.15);
+  font-family:'Orbitron',monospace; font-size:11px; font-weight:700;
+  letter-spacing:3px; color:#1a6a7a; margin-bottom:20px;
+  padding-bottom:12px; border-bottom:1px solid rgba(0,229,255,0.15);
 }
 
-/* UPLOAD ZONE */
+/* WALLET CONNECT BAR */
+.wallet-bar {
+  display:flex; align-items:center; justify-content:space-between;
+  background:rgba(0,255,100,0.05);
+  border:1px solid rgba(0,255,100,0.18);
+  border-radius:10px; padding:10px 14px; margin-bottom:18px; gap:10px;
+}
+.wallet-addr {
+  font-family:'Share Tech Mono',monospace; font-size:10px; color:#00cc44; letter-spacing:1px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;
+}
+.btn-wallet {
+  font-family:'Orbitron',monospace; font-size:9px; font-weight:700;
+  letter-spacing:1.5px; padding:8px 14px; border:none; border-radius:8px;
+  cursor:pointer; transition:all 0.2s; white-space:nowrap;
+  background:linear-gradient(135deg,#003300,#00aa44); color:#00ff44;
+  box-shadow:0 2px 12px rgba(0,255,68,0.2); border:1px solid rgba(0,255,68,0.3);
+}
+.btn-wallet:hover { filter:brightness(1.2); }
+.btn-wallet.connected {
+  background:linear-gradient(135deg,#1a0000,#660000); color:#ff4444;
+  box-shadow:0 2px 12px rgba(255,68,68,0.2); border-color:rgba(255,68,68,0.3);
+}
+
 .upload-zone {
-  border:2px dashed rgba(255,80,0,0.35);
-  border-radius:12px;
-  padding:32px 20px;
-  text-align:center;
-  cursor:pointer;
-  transition:all 0.3s;
-  margin-bottom:20px;
-  position:relative;
-  overflow:hidden;
+  border:2px dashed rgba(0,229,255,0.30); border-radius:12px;
+  padding:32px 20px; text-align:center; cursor:pointer;
+  transition:all 0.3s; margin-bottom:20px; position:relative; overflow:hidden;
 }
-
 .upload-zone:hover, .upload-zone.drag {
-  border-color:#ff4400;
-  background:rgba(255,68,0,0.06);
-  box-shadow:0 0 20px rgba(255,68,0,0.15);
+  border-color:#00e5ff; background:rgba(0,229,255,0.05);
+  box-shadow:0 0 20px rgba(0,229,255,0.18);
 }
-
-.upload-zone input {
-  position:absolute; inset:0;
-  opacity:0; cursor:pointer;
-  width:100%; height:100%;
-}
-
+.upload-zone input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
 .upload-icon { font-size:36px; margin-bottom:8px; }
-.upload-text { font-family:'Share Tech Mono',monospace; font-size:12px; color:#7a4a20; }
-.upload-text strong { color:#ff6600; }
+.upload-text { font-family:'Share Tech Mono',monospace; font-size:12px; color:#1a6a7a; }
+.upload-text strong { color:#00e5ff; }
 
-/* FORM ELEMENTS */
 .field { margin-bottom:16px; }
 .field label {
-  display:block;
-  font-family:'Share Tech Mono',monospace;
-  font-size:10px;
-  letter-spacing:2px;
-  color:#7a4a20;
-  margin-bottom:6px;
+  display:block; font-family:'Share Tech Mono',monospace; font-size:10px;
+  letter-spacing:2px; color:#1a6a7a; margin-bottom:6px;
 }
-
-.field input[type="text"],
-.field select {
-  width:100%;
-  background:rgba(255,60,0,0.04);
-  border:1px solid rgba(255,80,0,0.18);
-  border-radius:8px;
-  color:#ffd0a0;
-  font-family:'Rajdhani',sans-serif;
-  font-size:15px;
-  font-weight:600;
-  padding:10px 14px;
-  outline:none;
-  transition:border-color 0.2s;
-  -webkit-appearance:none;
+.field input[type="text"], .field select {
+  width:100%; background:rgba(255,60,0,0.04);
+  border:1px solid rgba(255,80,0,0.18); border-radius:8px;
+  color:#ffd0a0; font-family:'Rajdhani',sans-serif;
+  font-size:15px; font-weight:600; padding:10px 14px;
+  outline:none; transition:border-color 0.2s; -webkit-appearance:none;
 }
-
-.field input:focus,
-.field select:focus {
-  border-color:#ff4400;
-  box-shadow:0 0 10px rgba(255,68,0,0.2);
+.field input:focus, .field select:focus {
+  border-color:#00e5ff; box-shadow:0 0 10px rgba(0,229,255,0.25);
 }
-
-.field select option { background:#0d0400; color:#ffd0a0; }
-
+.field select option { background:#04060f; color:#e0f7fa; }
 .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
-/* STAT SLIDERS */
-.stat-row {
-  display:grid;
-  grid-template-columns:80px 1fr 36px;
-  align-items:center;
-  gap:10px;
-  margin-bottom:12px;
-}
+.stat-row { display:grid; grid-template-columns:80px 1fr 36px; align-items:center; gap:10px; margin-bottom:12px; }
+.stat-label { font-family:'Share Tech Mono',monospace; font-size:10px; color:#1a6a7a; letter-spacing:1px; }
+.stat-val { font-family:'Orbitron',monospace; font-size:13px; font-weight:700; color:#00e5ff; text-align:right; }
 
-.stat-label {
-  font-family:'Share Tech Mono',monospace;
-  font-size:10px;
-  color:#7a4a20;
-  letter-spacing:1px;
-}
-
-.stat-val {
-  font-family:'Orbitron',monospace;
-  font-size:13px;
-  font-weight:700;
-  color:#ff8800;
-  text-align:right;
-}
-
-input[type="range"] {
-  -webkit-appearance:none;
-  width:100%;
-  height:4px;
-  border-radius:2px;
-  background:rgba(255,80,0,0.12);
-  outline:none;
-}
-
+input[type="range"] { -webkit-appearance:none; width:100%; height:4px; border-radius:2px; background:rgba(255,80,0,0.12); outline:none; }
 input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance:none;
-  width:16px; height:16px;
-  border-radius:50%;
-  background:linear-gradient(135deg,#ff2200,#ff8800);
-  cursor:pointer;
+  -webkit-appearance:none; width:16px; height:16px; border-radius:50%;
+  background:linear-gradient(135deg,#ff2200,#ff8800); cursor:pointer;
   box-shadow:0 0 8px rgba(255,68,0,0.7);
 }
 
-/* COLOR BUTTONS */
-.colors-grid {
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:6px;
-  margin-top:8px;
-}
-
+.colors-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:8px; }
 .color-btn {
-  height:36px;
-  border-radius:8px;
-  border:2px solid transparent;
-  cursor:pointer;
-  font-size:9px;
-  font-family:'Share Tech Mono',monospace;
-  font-weight:700;
-  letter-spacing:1px;
-  transition:all 0.2s;
-  position:relative;
-  overflow:hidden;
+  height:36px; border-radius:8px; border:2px solid transparent; cursor:pointer;
+  font-size:9px; font-family:'Share Tech Mono',monospace; font-weight:700;
+  letter-spacing:1px; transition:all 0.2s; position:relative; overflow:hidden;
 }
-
-.color-btn.active {
-  border-color:white;
-  box-shadow:0 0 12px currentColor;
-  transform:scale(1.05);
-}
-
+.color-btn.active { border-color:white; box-shadow:0 0 12px currentColor; transform:scale(1.05); }
 .color-btn.active::after {
-  content:'✓';
-  position:absolute;
-  top:50%; left:50%;
-  transform:translate(-50%,-50%);
-  font-size:14px;
-  color:rgba(255,255,255,0.9);
+  content:'✓'; position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%); font-size:14px; color:rgba(255,255,255,0.9);
 }
 
-/* ACTION BUTTONS */
-.btn-row {
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  margin-top:20px;
-}
-
+.btn-row { display:flex; flex-direction:column; gap:10px; margin-top:20px; }
 .btn {
-  width:100%;
-  font-family:'Orbitron',monospace;
-  font-size:12px;
-  font-weight:700;
-  letter-spacing:2px;
-  padding:14px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  transition:box-shadow 0.25s, filter 0.25s;
-  position:relative;
-  overflow:hidden;
+  width:100%; font-family:'Orbitron',monospace; font-size:12px; font-weight:700;
+  letter-spacing:2px; padding:14px; border:none; border-radius:10px; cursor:pointer;
+  transition:box-shadow 0.25s, filter 0.25s; position:relative; overflow:hidden;
 }
-
 .btn::after {
-  content:'';
-  position:absolute; inset:0;
+  content:''; position:absolute; inset:0;
   background:linear-gradient(135deg,rgba(255,255,255,0.12),transparent);
-  opacity:0;
-  transition:opacity 0.2s;
+  opacity:0; transition:opacity 0.2s;
 }
-
 .btn:hover::after { opacity:1; }
 .btn:hover { filter:brightness(1.15); }
-
 .btn-generate {
-  background:linear-gradient(135deg,#cc2000,#ff4400,#ff7700);
-  color:#fff;
-  box-shadow:0 4px 24px rgba(255,68,0,0.5);
-  border:1px solid rgba(255,120,0,0.3);
-  text-shadow:0 1px 4px rgba(0,0,0,0.5);
+  background:linear-gradient(135deg,#003344,#006688,#00e5ff); color:#fff;
+  box-shadow:0 4px 24px rgba(0,229,255,0.45), 0 0 0 1px rgba(0,229,255,0.2);
+  border:1px solid rgba(0,229,255,0.35);
+  text-shadow:0 0 12px rgba(0,229,255,0.8);
 }
-
 .btn-download {
-  background:linear-gradient(135deg,#1a1a00,#665500,#ffaa00);
-  color:#fff;
-  box-shadow:0 4px 20px rgba(255,170,0,0.3);
-  border:1px solid rgba(255,200,0,0.2);
+  background:linear-gradient(135deg,#001a10,#006633,#00ff88); color:#fff;
+  box-shadow:0 4px 20px rgba(0,255,136,0.3), 0 0 0 1px rgba(0,255,136,0.15);
+  border:1px solid rgba(0,255,136,0.3);
+  text-shadow:0 0 10px rgba(0,255,136,0.7);
 }
-
 .btn-video {
-  background:linear-gradient(135deg,#300,#aa1100,#ff3300);
-  color:#ffaa88;
-  box-shadow:0 4px 20px rgba(200,0,0,0.3);
-  border:1px solid rgba(255,80,0,0.2);
+  background:linear-gradient(135deg,#001030,#003366,#0066cc); color:#7dd4fc;
+  box-shadow:0 4px 20px rgba(0,102,204,0.4), 0 0 0 1px rgba(0,150,255,0.15);
+  border:1px solid rgba(0,150,255,0.3);
+  text-shadow:0 0 10px rgba(100,200,255,0.7);
 }
+.btn:disabled { opacity:0.35; cursor:not-allowed; filter:none !important; }
 
-.btn:disabled {
-  opacity:0.35;
-  cursor:not-allowed;
-  filter:none !important;
-}
-
-/* STATUS */
 .status {
-  margin-top:14px;
-  padding:10px 14px;
-  background:rgba(0,0,0,0.5);
-  border:1px solid rgba(255,80,0,0.15);
-  border-radius:8px;
-  font-family:'Share Tech Mono',monospace;
-  font-size:11px;
-  color:#7a4a20;
-  text-align:center;
-  min-height:38px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  transition:all 0.3s;
+  margin-top:14px; padding:10px 14px; background:rgba(0,0,0,0.5);
+  border:1px solid rgba(0,229,255,0.12); border-radius:8px;
+  font-family:'Share Tech Mono',monospace; font-size:11px; color:#1a6a7a;
+  text-align:center; min-height:38px; display:flex; align-items:center;
+  justify-content:center; transition:all 0.3s;
 }
-
 .status.ok     { color:#00ff88; border-color:rgba(0,255,136,0.3); }
 .status.err    { color:#ff2244; border-color:rgba(255,34,68,0.3); }
 .status.active { color:#ff8800; border-color:rgba(255,136,0,0.3); }
 
-/* CANVAS PANEL */
-.canvas-panel {
-  position:sticky;
-  top:24px;
-}
-
+.canvas-panel { position:sticky; top:24px; }
 .canvas-wrap {
-  background:rgba(0,0,0,0.7);
-  border:1px solid rgba(255,80,0,0.15);
-  border-radius:16px;
-  padding:16px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:400px;
+  background:rgba(0,5,15,0.85); border:1px solid rgba(0,229,255,0.12);
+  border-radius:16px; padding:16px; display:flex;
+  align-items:center; justify-content:center; min-height:400px;
 }
-
-#canvas {
-  max-width:100%;
-  border-radius:12px;
-  box-shadow:0 20px 60px rgba(0,0,0,0.9), 0 0 40px rgba(255,68,0,0.15);
-  display:block;
-}
-
-.canvas-placeholder {
-  text-align:center;
-  color:#7a4a20;
-  font-family:'Share Tech Mono',monospace;
-  font-size:12px;
-}
-
+#canvas { max-width:100%; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.9), 0 0 40px rgba(255,68,0,0.15); display:block; }
+.canvas-placeholder { text-align:center; color:#1a6a7a; font-family:'Share Tech Mono',monospace; font-size:12px; }
 .canvas-placeholder .icon { font-size:48px; margin-bottom:12px; opacity:0.4; }
 
-/* PREVIEW BADGE */
 .preview-info {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-top:12px;
-  padding:8px 12px;
-  background:rgba(0,0,0,0.4);
-  border-radius:8px;
-  font-family:'Share Tech Mono',monospace;
-  font-size:10px;
-  color:#7a4a20;
+  display:flex; justify-content:space-between; align-items:center;
+  margin-top:12px; padding:8px 12px; background:rgba(0,0,0,0.4);
+  border-radius:8px; font-family:'Share Tech Mono',monospace; font-size:10px; color:#1a6a7a;
 }
 
-/* MOBILE */
 @media(max-width:768px) {
-  .wrap {
-    grid-template-columns:1fr;
-    padding:12px;
-    gap:16px;
-  }
+  .wrap { grid-template-columns:1fr; padding:12px; gap:16px; }
   .canvas-panel { position:static; }
   .header h1 { font-size:22px; letter-spacing:3px; }
   .colors-grid { grid-template-columns:repeat(4,1fr); }
 }
 
-/* PROGRESS BAR */
-.progress-wrap {
-  margin-top:10px;
-  height:3px;
-  background:rgba(255,80,0,0.1);
-  border-radius:2px;
-  overflow:hidden;
-  display:none;
-}
-
+.progress-wrap { margin-top:10px; height:3px; background:rgba(0,229,255,0.08); border-radius:2px; overflow:hidden; display:none; }
 .progress-wrap.show { display:block; }
-
 .progress-fill {
-  height:100%;
-  background:linear-gradient(90deg,#ff2200,#ff6600,#ffaa00);
-  border-radius:2px;
-  transition:width 0.1s;
-  box-shadow:0 0 8px rgba(255,100,0,0.8);
+  height:100%; background:linear-gradient(90deg,#00e5ff,#00ff88,#1affd5);
+  border-radius:2px; transition:width 0.1s; box-shadow:0 0 8px rgba(0,229,255,0.8);
 }
 
-/* RECORDING INDICATOR */
 .rec-indicator {
-  display:none;
-  align-items:center;
-  gap:8px;
-  padding:8px 14px;
-  background:rgba(255,34,0,0.12);
-  border:1px solid rgba(255,34,0,0.3);
-  border-radius:8px;
-  font-family:'Share Tech Mono',monospace;
-  font-size:11px;
-  color:#ff4422;
-  margin-top:10px;
+  display:none; align-items:center; gap:8px; padding:8px 14px;
+  background:rgba(255,34,0,0.12); border:1px solid rgba(255,34,0,0.3);
+  border-radius:8px; font-family:'Share Tech Mono',monospace; font-size:11px;
+  color:#ff4422; margin-top:10px;
 }
-
 .rec-indicator.show { display:flex; }
-
 .rec-dot {
-  width:8px; height:8px;
-  background:#ff2200;
-  border-radius:50%;
-  animation:recPulse 1s ease-in-out infinite;
-  box-shadow:0 0 6px #ff2200;
+  width:8px; height:8px; background:#ff2200; border-radius:50%;
+  animation:recPulse 1s ease-in-out infinite; box-shadow:0 0 6px #ff2200;
 }
-
 @keyframes recPulse {
   0%,100% { opacity:1; transform:scale(1); }
   50% { opacity:0.4; transform:scale(0.8); }
@@ -545,7 +334,6 @@ input[type="range"]::-webkit-slider-thumb {
 </head>
 <body>
 
-<!-- FLAME PARTICLES -->
 <div class="flame-layer">
   <div class="ember"></div><div class="ember"></div><div class="ember"></div>
   <div class="ember"></div><div class="ember"></div><div class="ember"></div>
@@ -558,13 +346,19 @@ input[type="range"]::-webkit-slider-thumb {
 <div class="wrap">
 
   <div class="header">
-    <h1>🔥 NFT CARD GENERATOR 🔥</h1>
-    <p>ANIMATED · ON-CHAIN READY · DOWNLOAD PNG & VIDEO</p>
+    <h1>⚡ NFT CARD GENERATOR ⚡</h1>
+    <p>ANIMATED · ON-CHAIN READY · DOWNLOAD PNG &amp; VIDEO</p>
   </div>
 
   <!-- CONTROLS -->
   <div class="panel">
     <div class="panel-title">// CARD CONFIGURATION</div>
+
+    <!-- WALLET CONNECT -->
+    <div class="wallet-bar">
+      <div class="wallet-addr" id="walletAddr">🔴 NOT CONNECTED</div>
+      <button class="btn-wallet" id="connectWalletBtn" onclick="toggleWallet()">🔗 CONNECT</button>
+    </div>
 
     <!-- UPLOAD -->
     <div class="upload-zone" id="uploadZone">
@@ -597,7 +391,7 @@ input[type="range"]::-webkit-slider-thumb {
 
     <!-- EDITION / SERIAL -->
     <div class="field">
-      <label>EDITION & SERIAL</label>
+      <label>EDITION &amp; SERIAL</label>
       <div class="grid2">
         <input type="text" id="edition" placeholder="1/100" value="1/100">
         <input type="text" id="serial" placeholder="#001" value="#001">
@@ -632,24 +426,25 @@ input[type="range"]::-webkit-slider-thumb {
     <!-- COLORS -->
     <div class="field">
       <label>NEON LIGHTNING COLORS — CLICK TO TOGGLE</label>
-      <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
-        <button onclick="setPalette('neon')" style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;padding:5px 10px;background:linear-gradient(135deg,#ff00ff,#00ffff);color:#000;border:none;border-radius:6px;cursor:pointer">⚡ NEON</button>
-        <button onclick="setPalette('matrix')" style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;padding:5px 10px;background:linear-gradient(135deg,#00ff00,#003300);color:#fff;border:none;border-radius:6px;cursor:pointer">🟢 MATRIX</button>
-        <button onclick="setPalette('mono')" style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;padding:5px 10px;background:linear-gradient(135deg,#ffffff,#444);color:#000;border:none;border-radius:6px;cursor:pointer">⬜ MONO</button>
-        <button onclick="setPalette('fire')" style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;padding:5px 10px;background:linear-gradient(135deg,#ff1744,#f59e0b);color:#fff;border:none;border-radius:6px;cursor:pointer">🔥 FIRE</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+        <button onclick="setPalette('cyber')"  style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;padding:8px 6px;background:linear-gradient(135deg,#00ff88,#00e5ff);color:#000;border:none;border-radius:8px;cursor:pointer;font-weight:700">🌊 CYBER</button>
+        <button onclick="setPalette('neon')"   style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;padding:8px 6px;background:linear-gradient(135deg,#ff00ff,#00ffff);color:#000;border:none;border-radius:8px;cursor:pointer;font-weight:700">⚡ NEON</button>
+        <button onclick="setPalette('matrix')" style="grid-column:1/-1;justify-self:center;width:48%;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;padding:8px 6px;background:linear-gradient(135deg,#00ff00,#003300);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700">🟢 MATRIX</button>
+        <button onclick="setPalette('mono')"   style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;padding:8px 6px;background:linear-gradient(135deg,#ffffff,#444);color:#000;border:none;border-radius:8px;cursor:pointer;font-weight:700">⬜ MONO</button>
+        <button onclick="setPalette('fire')"   style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;padding:8px 6px;background:linear-gradient(135deg,#ff1744,#f59e0b);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700">🔥 FIRE</button>
       </div>
       <div class="colors-grid">
-        <button class="color-btn active" style="background:#00ff00;color:#000" data-color="#00ff00">GREEN</button>
-        <button class="color-btn active" style="background:#00ffff;color:#000" data-color="#00ffff">CYAN</button>
-        <button class="color-btn active" style="background:#ff00ff;color:#000" data-color="#ff00ff">MAGENTA</button>
-        <button class="color-btn active" style="background:#ffff00;color:#000" data-color="#ffff00">YELLOW</button>
-        <button class="color-btn active" style="background:#ff0080;color:#fff" data-color="#ff0080">PINK</button>
-        <button class="color-btn active" style="background:#8000ff;color:#fff" data-color="#8000ff">PURPLE</button>
-        <button class="color-btn active" style="background:#ff1744;color:#fff" data-color="#ff1744">RED</button>
+        <button class="color-btn active" style="background:#00ff88;color:#000" data-color="#00ff88">MINT</button>
         <button class="color-btn active" style="background:#00e5ff;color:#000" data-color="#00e5ff">BLUE</button>
-        <button class="color-btn" style="background:#00cc44;color:#000" data-color="#00cc44">LIME</button>
-        <button class="color-btn" style="background:#005500;color:#00ff00;border:1px solid #00ff00" data-color="#005500">D.GREEN</button>
-        <button class="color-btn" style="background:#111;color:#aaa;border:1px solid #333" data-color="#111111">BLACK</button>
+        <button class="color-btn active" style="background:#1affd5;color:#000" data-color="#1affd5">AQUA</button>
+        <button class="color-btn active" style="background:#00ffff;color:#000" data-color="#00ffff">CYAN</button>
+        <button class="color-btn active" style="background:#00ff00;color:#000" data-color="#00ff00">GREEN</button>
+        <button class="color-btn active" style="background:#00bfff;color:#000" data-color="#00bfff">SKY</button>
+        <button class="color-btn active" style="background:#00ff44;color:#000" data-color="#00ff44">LIME</button>
+        <button class="color-btn active" style="background:#00ccff;color:#000" data-color="#00ccff">NEON</button>
+        <button class="color-btn" style="background:#ff00ff;color:#000" data-color="#ff00ff">MAGENTA</button>
+        <button class="color-btn" style="background:#ffff00;color:#000" data-color="#ffff00">YELLOW</button>
+        <button class="color-btn" style="background:#ff1744;color:#fff" data-color="#ff1744">RED</button>
         <button class="color-btn" style="background:#ffffff;color:#000" data-color="#ffffff">WHITE</button>
       </div>
     </div>
@@ -706,20 +501,30 @@ input[type="range"]::-webkit-slider-thumb {
 </div>
 
 <script>
+// ── THIRDWEB CONFIG ── (client ID only — secret key NEVER goes in frontend)
+const THIRDWEB_CLIENT_ID = '39d5688409d060364e2d612723c14984';
+let twClient = null;
+try {
+  if (window.thirdweb && window.thirdweb.createThirdwebClient) {
+    twClient = window.thirdweb.createThirdwebClient({ clientId: THIRDWEB_CLIENT_ID });
+  }
+} catch(e) { console.warn('thirdweb SDK not loaded:', e); }
+
 // ── STATE ──
 let img = null;
 let animId = null;
 let time = 0;
 let isAnimating = false;
-let activeColors = ['#00ff00','#00ffff','#ff00ff','#ffff00','#ff0080','#8000ff','#ff1744','#00e5ff'];
+let activeColors = ['#00ff88','#00e5ff','#1affd5','#00ffff','#00ff00','#00bfff','#00ff44','#00ccff'];
+let connectedAccount = null;
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-// ── OWNER / CHAIN CONFIG ──
-const OWNER_ADDRESS = '0x592B35c8917eD36c39Ef73D0F5e92B0173560b2e';
-const MONAD_CHAIN_ID = '0x8F';
-const MINT_PRICE_WEI = '0x' + (BigInt('100000000000000000000')).toString(16);
+// ── CHAIN CONFIG ──
+const OWNER_ADDRESS  = '0x592B35c8917eD36c39Ef73D0F5e92B0173560b2e';
+const MONAD_CHAIN_ID = '0x8F'; // 143 decimal
+const MINT_PRICE_WEI = '0x' + (BigInt('100000000000000000000')).toString(16); // 100 MON
 
 // ── STATUS HELPER ──
 function setStatus(msg, type='') {
@@ -728,9 +533,67 @@ function setStatus(msg, type='') {
   el.className = 'status ' + type;
 }
 
+// ── WALLET HELPERS ──
+function shortAddr(addr) {
+  return addr ? addr.slice(0,6) + '...' + addr.slice(-4) : '';
+}
+
+function updateWalletUI() {
+  const addrEl  = document.getElementById('walletAddr');
+  const btnEl   = document.getElementById('connectWalletBtn');
+  if (connectedAccount) {
+    addrEl.textContent = '🟢 ' + shortAddr(connectedAccount);
+    btnEl.textContent  = '🔌 DISCONNECT';
+    btnEl.classList.add('connected');
+  } else {
+    addrEl.textContent = '🔴 NOT CONNECTED';
+    btnEl.textContent  = '🔗 CONNECT';
+    btnEl.classList.remove('connected');
+  }
+}
+
+async function toggleWallet() {
+  if (connectedAccount) {
+    connectedAccount = null;
+    updateWalletUI();
+    setStatus('🔌 Wallet disconnected', '');
+    return;
+  }
+  await connectWallet();
+}
+
+async function connectWallet() {
+  if (!window.ethereum) {
+    setStatus('❌ No wallet detected — install MetaMask or Rabby', 'err');
+    return null;
+  }
+  try {
+    setStatus('🔗 Connecting wallet...', 'active');
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    connectedAccount = accounts[0];
+    updateWalletUI();
+    setStatus('✅ Wallet connected: ' + shortAddr(connectedAccount), 'ok');
+    return connectedAccount;
+  } catch(e) {
+    if (e.code === 4001) setStatus('❌ Connection rejected', 'err');
+    else setStatus('❌ ' + (e.message || 'Wallet error'), 'err');
+    return null;
+  }
+}
+
+// Listen for account changes
+if (window.ethereum) {
+  window.ethereum.on('accountsChanged', (accounts) => {
+    connectedAccount = accounts[0] || null;
+    updateWalletUI();
+  });
+  window.ethereum.on('chainChanged', () => window.location.reload());
+}
+
 // ── PALETTE PRESETS ──
 function setPalette(name) {
   const palettes = {
+    cyber:  ['#00ff88','#00e5ff','#1affd5','#00ffff','#00ff00','#00bfff','#00ff44','#00ccff'],
     neon:   ['#00ff00','#00ffff','#ff00ff','#ffff00','#ff0080','#8000ff','#ff1744','#00e5ff'],
     matrix: ['#00ff00','#00cc44','#005500','#00ff44','#44ff88','#00aa33','#003300','#ffffff'],
     mono:   ['#ffffff','#cccccc','#888888','#444444','#ffffff','#aaaaaa','#333333','#111111'],
@@ -752,27 +615,38 @@ async function mintOnChain() {
   const btn = document.getElementById('mintBtn');
   btn.disabled = true;
   try {
-    setStatus('🔗 Connecting wallet...', 'active');
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    const account = accounts[0];
+    // Ensure wallet connected
+    if (!connectedAccount) {
+      const acc = await connectWallet();
+      if (!acc) { btn.disabled = false; return; }
+    }
+
+    // Switch to Monad chain
     try {
       await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: MONAD_CHAIN_ID }] });
     } catch(e) {
       if (e.code === 4902 || e.code === -32603) {
-        await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{
-          chainId: MONAD_CHAIN_ID, chainName: 'Monad Mainnet',
-          nativeCurrency: { name:'MON', symbol:'MON', decimals:18 },
-          rpcUrls: ['https://rpc.monad.xyz'],
-          blockExplorerUrls: ['https://explorer.monad.xyz']
-        }]});
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: MONAD_CHAIN_ID, chainName: 'Monad Mainnet',
+            nativeCurrency: { name:'MON', symbol:'MON', decimals:18 },
+            rpcUrls: ['https://rpc.monad.xyz'],
+            blockExplorerUrls: ['https://explorer.monad.xyz']
+          }]
+        });
+      } else {
+        throw e;
       }
     }
-    setStatus('💸 Sending 100 MON — confirm in wallet...', 'active');
+
+    setStatus('💸 Confirm payment of 100 MON in wallet...', 'active');
     const txHash = await window.ethereum.request({
       method: 'eth_sendTransaction',
-      params: [{ from: account, to: OWNER_ADDRESS, value: MINT_PRICE_WEI, gas: '0x5208' }]
+      params: [{ from: connectedAccount, to: OWNER_ADDRESS, value: MINT_PRICE_WEI, gas: '0x5208' }]
     });
-    setStatus('⏳ Confirming transaction...', 'active');
+
+    setStatus('⏳ Waiting for confirmation...', 'active');
     const receipt = await new Promise((resolve, reject) => {
       let attempts = 0;
       const poll = setInterval(async () => {
@@ -787,6 +661,7 @@ async function mintOnChain() {
         } catch(e) {}
       }, 2000);
     });
+
     if (receipt.status === '0x1') {
       setStatus('✅ MINTED! TX: ' + txHash.slice(0,14) + '...', 'ok');
       setTimeout(() => downloadCard(), 600);
@@ -808,48 +683,29 @@ document.querySelectorAll('.color-btn').forEach(btn => {
     activeColors = [...document.querySelectorAll('.color-btn.active')].map(b => b.dataset.color);
     if (activeColors.length === 0) {
       activeColors = ['#ffffff'];
-      btn.classList.add('active'); // keep at least one
+      btn.classList.add('active');
     }
-    if (isAnimating) drawCard(); // live update
   });
 });
 
 // ── STAT SLIDERS ──
 ['attack','defense','speed','magic'].forEach(s => {
   const input = document.getElementById(s + 'Level');
-  const val = document.getElementById(s + 'Val');
-  input.addEventListener('input', () => {
-    val.textContent = input.value;
-    // No redraw needed — animation loop handles it
-  });
-});
-
-// ── LIVE REDRAW on input changes ──
-['nftName','rarityGrade','edition','serial'].forEach(id => {
-  document.getElementById(id).addEventListener('input', () => {
-    // animation loop picks up changes automatically
-  });
+  const val   = document.getElementById(s + 'Val');
+  input.addEventListener('input', () => { val.textContent = input.value; });
 });
 
 // ── UPLOAD ──
 const uploadZone = document.getElementById('uploadZone');
 const imageInput = document.getElementById('imageInput');
 
-// Drag and drop
-uploadZone.addEventListener('dragover', e => {
-  e.preventDefault();
-  uploadZone.classList.add('drag');
-});
-
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag'); });
 uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag'));
-
 uploadZone.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadZone.classList.remove('drag');
+  e.preventDefault(); uploadZone.classList.remove('drag');
   const file = e.dataTransfer.files[0];
   if (file && file.type.startsWith('image/')) loadImage(file);
 });
-
 imageInput.addEventListener('change', e => {
   const file = e.target.files[0];
   if (file) loadImage(file);
@@ -876,49 +732,28 @@ function loadImage(file) {
 
 // ── GENERATE ──
 function generateCard() {
-  if (!img) {
-    setStatus('⚠️ Please upload an image first!', 'err');
-    return;
-  }
-
-  // Show canvas
+  if (!img) { setStatus('⚠️ Please upload an image first!', 'err'); return; }
   document.getElementById('placeholder').style.display = 'none';
   canvas.style.display = 'block';
   document.getElementById('previewInfo').style.display = 'flex';
-
-  // Enable buttons
   document.getElementById('downloadBtn').disabled = false;
   document.getElementById('videoBtn').disabled = false;
-
-  // Start animation
   if (animId) cancelAnimationFrame(animId);
-  time = 0;
-  isAnimating = true;
+  time = 0; isAnimating = true;
   animate();
   setStatus('✨ Card generating — fully animated!', 'ok');
 }
 
-let lastTime = 0;
-let fps = 0;
-let frameCount = 0;
-let fpsTimer = 0;
+let lastTime = 0, fps = 0, frameCount = 0, fpsTimer = 0;
 
 function animate(ts = 0) {
   if (!isAnimating) return;
-
-  const dt = ts - lastTime;
-  lastTime = ts;
-
-  // FPS counter
-  frameCount++;
-  fpsTimer += dt;
+  const dt = ts - lastTime; lastTime = ts;
+  frameCount++; fpsTimer += dt;
   if (fpsTimer >= 1000) {
-    fps = frameCount;
-    frameCount = 0;
-    fpsTimer = 0;
+    fps = frameCount; frameCount = 0; fpsTimer = 0;
     document.getElementById('previewFps').textContent = fps + ' FPS';
   }
-
   time += 0.025;
   drawCard();
   animId = requestAnimationFrame(animate);
@@ -926,7 +761,7 @@ function animate(ts = 0) {
 
 // ── DRAW CARD ──
 function drawCard() {
-  const name     = document.getElementById('nftName').value || 'NFT #001';
+  const name      = document.getElementById('nftName').value || 'NFT #001';
   const rarityRaw = document.getElementById('rarityGrade').value;
   const [grade, colorStr, icon, rarityName] = rarityRaw.split('|');
   const rarityColors = colorStr.split(',');
@@ -938,18 +773,14 @@ function drawCard() {
   const serial   = document.getElementById('serial').value;
   const cols     = activeColors.length > 0 ? activeColors : ['#ffffff'];
 
-  canvas.width  = 800;
-  canvas.height = 1200;
+  canvas.width = 800; canvas.height = 1200;
 
-  // ── BACKGROUND ──
+  // Background
   const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-  bg.addColorStop(0, '#08051a');
-  bg.addColorStop(0.5, '#0d0820');
-  bg.addColorStop(1, '#050510');
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  bg.addColorStop(0, '#020810'); bg.addColorStop(0.5, '#030c18'); bg.addColorStop(1, '#010508');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // ── AMBIENT ORBS ──
+  // Ambient orbs
   for (let i = 0; i < 6; i++) {
     const angle = time * 0.8 + (i * Math.PI * 2 / 6);
     const r = 220 + Math.sin(time * 2 + i) * 60;
@@ -957,251 +788,161 @@ function drawCard() {
     const y = canvas.height / 2 + Math.sin(angle) * r * 0.6;
     const col = cols[i % cols.length];
     const grd = ctx.createRadialGradient(x, y, 0, x, y, 80);
-    grd.addColorStop(0, col + '44');
-    grd.addColorStop(1, 'transparent');
-    ctx.fillStyle = grd;
-    ctx.beginPath();
-    ctx.arc(x, y, 80, 0, Math.PI * 2);
-    ctx.fill();
+    grd.addColorStop(0, col + '44'); grd.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(x, y, 80, 0, Math.PI * 2); ctx.fill();
   }
 
-  // ── OUTER BORDER (animated) ──
+  // Outer border
   const borderCol = cols[Math.floor(time * 1.5) % cols.length];
   ctx.save();
-  ctx.strokeStyle = borderCol;
-  ctx.lineWidth = 6;
-  ctx.shadowColor = borderCol;
-  ctx.shadowBlur = 24;
-  roundRect(ctx, 16, 16, canvas.width - 32, canvas.height - 32, 20);
-  ctx.stroke();
+  ctx.strokeStyle = borderCol; ctx.lineWidth = 6;
+  ctx.shadowColor = borderCol; ctx.shadowBlur = 24;
+  roundRect(ctx, 16, 16, canvas.width - 32, canvas.height - 32, 20); ctx.stroke();
   ctx.restore();
-
-  // Corner accents
   drawCornerAccents(borderCol);
 
-  // ── IMAGE AREA ──
+  // Image area
   const imgX = 40, imgY = 56, imgW = canvas.width - 80, imgH = 560;
-
   ctx.save();
-  ctx.shadowColor = borderCol;
-  ctx.shadowBlur = 16;
-  ctx.strokeStyle = borderCol;
-  ctx.lineWidth = 3;
-  roundRect(ctx, imgX - 2, imgY - 2, imgW + 4, imgH + 4, 14);
-  ctx.stroke();
+  ctx.shadowColor = borderCol; ctx.shadowBlur = 16;
+  ctx.strokeStyle = borderCol; ctx.lineWidth = 3;
+  roundRect(ctx, imgX - 2, imgY - 2, imgW + 4, imgH + 4, 14); ctx.stroke();
   ctx.restore();
 
-  // Image clipped
   ctx.save();
-  roundRect(ctx, imgX, imgY, imgW, imgH, 12);
-  ctx.clip();
-
-  // Draw image scaled to fill
+  roundRect(ctx, imgX, imgY, imgW, imgH, 12); ctx.clip();
   const scale = Math.max(imgW / img.width, imgH / img.height);
-  const sw = img.width * scale;
-  const sh = img.height * scale;
-  const sx = imgX + (imgW - sw) / 2;
-  const sy = imgY + (imgH - sh) / 2;
+  const sw = img.width * scale, sh = img.height * scale;
+  const sx = imgX + (imgW - sw) / 2, sy = imgY + (imgH - sh) / 2;
   ctx.drawImage(img, sx, sy, sw, sh);
 
-  // Overlay shimmer
+  // Shimmer
   const shimX = ((time * 120) % (imgW + 200)) - 100;
   const shimGrd = ctx.createLinearGradient(imgX + shimX, 0, imgX + shimX + 100, 0);
   shimGrd.addColorStop(0, 'transparent');
   shimGrd.addColorStop(0.5, 'rgba(255,255,255,0.08)');
   shimGrd.addColorStop(1, 'transparent');
-  ctx.fillStyle = shimGrd;
-  ctx.fillRect(imgX, imgY, imgW, imgH);
-
-  // Color tint pulse
+  ctx.fillStyle = shimGrd; ctx.fillRect(imgX, imgY, imgW, imgH);
   ctx.globalCompositeOperation = 'screen';
   ctx.fillStyle = cols[Math.floor(time * 0.5) % cols.length] + '18';
   ctx.fillRect(imgX, imgY, imgW, imgH);
   ctx.globalCompositeOperation = 'source-over';
   ctx.restore();
 
-  // ── FLOATING ICONS ──
+  // Floating icons
   const floatIcons = ['⭐','💎','⚡','✨','🔥','💫'];
   for (let i = 0; i < 8; i++) {
     const angle = time * 1.2 + i * 0.785;
     const r = 220 + Math.sin(time * 2.5 + i * 1.3) * 40;
-    const x = imgX + imgW / 2 + Math.cos(angle) * (r * 0.52);
-    const y = imgY + imgH / 2 + Math.sin(angle) * (r * 0.34);
+    const fx = imgX + imgW / 2 + Math.cos(angle) * (r * 0.52);
+    const fy = imgY + imgH / 2 + Math.sin(angle) * (r * 0.34);
     const sz = 20 + Math.sin(time * 3 + i) * 5;
     ctx.save();
-    ctx.shadowColor = cols[i % cols.length];
-    ctx.shadowBlur = 18;
-    ctx.font = `${sz}px Arial`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+    ctx.shadowColor = cols[i % cols.length]; ctx.shadowBlur = 18;
+    ctx.font = `${sz}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.globalAlpha = 0.7 + Math.sin(time * 2 + i) * 0.3;
-    ctx.fillText(floatIcons[i % floatIcons.length], x, y);
+    ctx.fillText(floatIcons[i % floatIcons.length], fx, fy);
     ctx.restore();
   }
 
-  // ── RARITY BADGE ──
+  // Rarity badge
   const badgeY = imgY + imgH - 50;
   const pulse = Math.sin(time * 3) * 10;
   const rGrd = ctx.createLinearGradient(canvas.width / 2 - 140, 0, canvas.width / 2 + 140, 0);
-  rarityColors.forEach((c, i) => rGrd.addColorStop(i / (rarityColors.length - 1), c));
-
+  rarityColors.forEach((c, i) => rGrd.addColorStop(i / Math.max(rarityColors.length - 1, 1), c));
   ctx.save();
-  ctx.shadowColor = rarityColors[0];
-  ctx.shadowBlur = 20 + pulse;
+  ctx.shadowColor = rarityColors[0]; ctx.shadowBlur = 20 + pulse;
   ctx.fillStyle = 'rgba(0,0,0,0.92)';
-  roundRect(ctx, canvas.width / 2 - 140, badgeY - 26, 280, 52, 26);
-  ctx.fill();
-  ctx.strokeStyle = rGrd;
-  ctx.lineWidth = 3;
-  ctx.stroke();
-  ctx.font = 'bold 30px Arial';
-  ctx.fillStyle = rGrd;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.shadowBlur = 30;
+  roundRect(ctx, canvas.width / 2 - 140, badgeY - 26, 280, 52, 26); ctx.fill();
+  ctx.strokeStyle = rGrd; ctx.lineWidth = 3; ctx.stroke();
+  ctx.font = 'bold 30px Arial'; ctx.fillStyle = rGrd;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.shadowBlur = 30;
   ctx.fillText(`${icon} ${grade} ${icon}`, canvas.width / 2, badgeY);
   ctx.restore();
 
-  // ── NAME PANEL ──
+  // Name panel
   const nameY = imgY + imgH + 20;
   ctx.fillStyle = 'rgba(0,0,0,0.88)';
-  ctx.save();
-  roundRect(ctx, 40, nameY, canvas.width - 80, 70, 10);
-  ctx.fill();
-  ctx.restore();
+  ctx.save(); roundRect(ctx, 40, nameY, canvas.width - 80, 70, 10); ctx.fill(); ctx.restore();
 
-  // Name text
   const nameCol = cols[Math.floor(time * 1.2) % cols.length];
   ctx.save();
-  ctx.shadowColor = nameCol;
-  ctx.shadowBlur = 14;
-  ctx.fillStyle = nameCol;
-  ctx.font = 'bold 26px Orbitron, monospace';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
-  // Truncate if too long
+  ctx.shadowColor = nameCol; ctx.shadowBlur = 14; ctx.fillStyle = nameCol;
+  ctx.font = 'bold 26px monospace'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
   let displayName = name;
-  ctx.font = 'bold 26px monospace';
   while (ctx.measureText(displayName).width > canvas.width - 200 && displayName.length > 3) {
     displayName = displayName.slice(0, -1);
   }
-  ctx.fillText(displayName, 60, nameY + 25);
-  ctx.restore();
+  ctx.fillText(displayName, 60, nameY + 25); ctx.restore();
 
-  // Serial
   ctx.save();
-  ctx.fillStyle = '#888';
-  ctx.font = '18px monospace';
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(serial, canvas.width - 60, nameY + 25);
-  ctx.restore();
+  ctx.fillStyle = '#888'; ctx.font = '18px monospace';
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  ctx.fillText(serial, canvas.width - 60, nameY + 25); ctx.restore();
 
-  // Edition
   ctx.save();
-  ctx.fillStyle = '#555';
-  ctx.font = '14px monospace';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(`EDITION ${edition}`, canvas.width / 2, nameY + 55);
-  ctx.restore();
+  ctx.fillStyle = '#555'; ctx.font = '14px monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(`EDITION ${edition}`, canvas.width / 2, nameY + 55); ctx.restore();
 
-  // ── STAT BARS ──
+  // Stat bars
   const statsY = nameY + 85;
-  const stats = [
+  [
     { label:'ATTACK',  val:attack,  icon:'⚔️' },
     { label:'DEFENSE', val:defense, icon:'🛡️' },
     { label:'SPEED',   val:speed,   icon:'⚡' },
     { label:'MAGIC',   val:magic,   icon:'✨' },
-  ];
+  ].forEach((s, i) => drawStatBar(s, statsY + i * 78, cols, time));
 
-  stats.forEach((s, i) => drawStatBar(s, statsY + i * 78, cols, time));
-
-  // ── BOTTOM WATERMARK ──
+  // Watermark
   ctx.save();
-  ctx.fillStyle = 'rgba(255,255,255,0.12)';
-  ctx.font = '11px monospace';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(255,255,255,0.12)'; ctx.font = '11px monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText('NFT CARD GENERATOR PRO · imperamonad.xyz', canvas.width / 2, canvas.height - 22);
   ctx.restore();
 }
 
 function drawStatBar(stat, y, cols, t) {
-  const x = 50;
-  const w = canvas.width - 100;
-  const h = 22;
+  const x = 50, w = canvas.width - 100, h = 22;
   const fill = Math.max(0, Math.min(1, stat.val / 100)) * w;
-
-  // Label
   const lCol = cols[Math.floor(t * 1.5) % cols.length];
   ctx.save();
-  ctx.fillStyle = lCol;
-  ctx.shadowColor = lCol;
-  ctx.shadowBlur = 8;
-  ctx.font = 'bold 15px monospace';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'bottom';
+  ctx.fillStyle = lCol; ctx.shadowColor = lCol; ctx.shadowBlur = 8;
+  ctx.font = 'bold 15px monospace'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
   ctx.fillText(`${stat.icon} ${stat.label}`, x, y - 4);
-  ctx.textAlign = 'right';
-  ctx.fillStyle = '#ccc';
-  ctx.shadowBlur = 0;
-  ctx.fillText(`${stat.val}/100`, x + w, y - 4);
-  ctx.restore();
+  ctx.textAlign = 'right'; ctx.fillStyle = '#ccc'; ctx.shadowBlur = 0;
+  ctx.fillText(`${stat.val}/100`, x + w, y - 4); ctx.restore();
 
-  // Track
   ctx.save();
   ctx.fillStyle = 'rgba(255,255,255,0.06)';
-  roundRect(ctx, x, y, w, h, h / 2);
-  ctx.fill();
-
-  // Fill
+  roundRect(ctx, x, y, w, h, h / 2); ctx.fill();
   if (fill > 0) {
     const barGrd = ctx.createLinearGradient(x, 0, x + fill, 0);
     for (let i = 0; i < 3; i++) barGrd.addColorStop(i / 2, cols[(Math.floor(t * 2) + i) % cols.length]);
-    ctx.fillStyle = barGrd;
-    ctx.shadowColor = cols[Math.floor(t) % cols.length];
-    ctx.shadowBlur = 12;
-    roundRect(ctx, x, y, fill, h, h / 2);
-    ctx.fill();
-
-    // Shimmer on bar
+    ctx.fillStyle = barGrd; ctx.shadowColor = cols[Math.floor(t) % cols.length]; ctx.shadowBlur = 12;
+    roundRect(ctx, x, y, fill, h, h / 2); ctx.fill();
     const shimPos = ((t * 180) % (fill + 80)) - 40;
     const sg = ctx.createLinearGradient(x + shimPos, 0, x + shimPos + 60, 0);
-    sg.addColorStop(0, 'transparent');
-    sg.addColorStop(0.5, 'rgba(255,255,255,0.5)');
-    sg.addColorStop(1, 'transparent');
-    ctx.fillStyle = sg;
-    ctx.shadowBlur = 0;
-    roundRect(ctx, x, y, fill, h, h / 2);
-    ctx.fill();
+    sg.addColorStop(0, 'transparent'); sg.addColorStop(0.5, 'rgba(255,255,255,0.5)'); sg.addColorStop(1, 'transparent');
+    ctx.fillStyle = sg; ctx.shadowBlur = 0;
+    roundRect(ctx, x, y, fill, h, h / 2); ctx.fill();
   }
   ctx.restore();
 }
 
 function drawCornerAccents(col) {
-  const size = 30;
-  const pad = 16;
+  const size = 30, pad = 16;
   const corners = [
-    [pad, pad, 0, 0],
-    [canvas.width - pad, pad, Math.PI / 2, 0],
-    [canvas.width - pad, canvas.height - pad, Math.PI, 0],
-    [pad, canvas.height - pad, -Math.PI / 2, 0],
+    [pad, pad, 0],
+    [canvas.width - pad, pad, Math.PI / 2],
+    [canvas.width - pad, canvas.height - pad, Math.PI],
+    [pad, canvas.height - pad, -Math.PI / 2],
   ];
   ctx.save();
-  ctx.strokeStyle = col;
-  ctx.lineWidth = 3;
-  ctx.shadowColor = col;
-  ctx.shadowBlur = 12;
+  ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.shadowColor = col; ctx.shadowBlur = 12;
   corners.forEach(([x, y, rot]) => {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(rot);
-    ctx.beginPath();
-    ctx.moveTo(0, size);
-    ctx.lineTo(0, 0);
-    ctx.lineTo(size, 0);
-    ctx.stroke();
+    ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+    ctx.beginPath(); ctx.moveTo(0, size); ctx.lineTo(0, 0); ctx.lineTo(size, 0); ctx.stroke();
     ctx.restore();
   });
   ctx.restore();
@@ -1210,26 +951,20 @@ function drawCornerAccents(col) {
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
   ctx.closePath();
 }
 
 // ── DOWNLOAD PNG ──
 function downloadCard() {
   if (!img) { setStatus('❌ Generate a card first!', 'err'); return; }
-
   setStatus('💾 Preparing PNG download...', 'active');
   const wasAnim = isAnimating;
   isAnimating = false;
   if (animId) cancelAnimationFrame(animId);
-
   setTimeout(() => {
     drawCard();
     canvas.toBlob(blob => {
@@ -1237,18 +972,11 @@ function downloadCard() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       const name = (document.getElementById('nftName').value || 'nft-card').replace(/[^a-z0-9]/gi, '-').toLowerCase();
-      a.download = `${name}.png`;
-      a.href = url;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      a.download = `${name}.png`; a.href = url;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      setStatus('✅ PNG downloaded successfully!', 'ok');
-
-      if (wasAnim) {
-        isAnimating = true;
-        animate();
-      }
+      setStatus('✅ PNG downloaded!', 'ok');
+      if (wasAnim) { isAnimating = true; animate(); }
     }, 'image/png');
   }, 100);
 }
@@ -1256,139 +984,111 @@ function downloadCard() {
 // ── DOWNLOAD VIDEO ──
 function downloadVideo() {
   if (!img) { setStatus('❌ Generate a card first!', 'err'); return; }
+  if (!canvas.captureStream) { setStatus('❌ Video not supported — use Chrome or Firefox', 'err'); return; }
 
-  // Check support
-  if (!canvas.captureStream) {
-    setStatus('❌ Video not supported — use Chrome or Firefox', 'err');
-    return;
-  }
-
-  // Check MediaRecorder support
-  const mimeTypes = [
-    'video/webm;codecs=vp9',
-    'video/webm;codecs=vp8',
-    'video/webm',
-    'video/mp4',
-  ];
-
+  const mimeTypes = ['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm','video/mp4'];
   let mimeType = '';
   for (const type of mimeTypes) {
-    if (MediaRecorder.isTypeSupported(type)) {
-      mimeType = type;
-      break;
-    }
+    if (MediaRecorder.isTypeSupported(type)) { mimeType = type; break; }
   }
-
-  if (!mimeType) {
-    setStatus('❌ Video recording not supported in this browser', 'err');
-    return;
-  }
+  if (!mimeType) { setStatus('❌ Video recording not supported in this browser', 'err'); return; }
 
   document.getElementById('videoBtn').disabled = true;
   document.getElementById('downloadBtn').disabled = true;
+  if (!isAnimating) { isAnimating = true; animate(); }
 
-  // Make sure animation is running
-  if (!isAnimating) {
-    isAnimating = true;
-    animate();
-  }
-
-  // Show recording indicator
   const recIndicator = document.getElementById('recIndicator');
   recIndicator.classList.add('show');
-  const recTimer = document.getElementById('recTimer');
-
-  // Progress bar
+  const recTimerEl = document.getElementById('recTimer');
   const progressWrap = document.getElementById('progressWrap');
   const progressFill = document.getElementById('progressFill');
-  progressWrap.classList.add('show');
-  progressFill.style.width = '0%';
-
+  progressWrap.classList.add('show'); progressFill.style.width = '0%';
   setStatus('🎬 Recording 5s video...', 'active');
 
   try {
     const stream = canvas.captureStream(30);
-    const recorder = new MediaRecorder(stream, {
-      mimeType,
-      videoBitsPerSecond: 8000000,
-    });
-
+    const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8000000 });
     const chunks = [];
     recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-
-    recorder.onerror = e => {
-      setStatus('❌ Recording error: ' + e.error, 'err');
-      cleanup();
-    };
-
+    recorder.onerror = () => { setStatus('❌ Recording error', 'err'); cleanup(); };
     recorder.onstop = () => {
-      if (chunks.length === 0) {
-        setStatus('❌ No video data captured', 'err');
-        cleanup();
-        return;
-      }
+      if (!chunks.length) { setStatus('❌ No video data captured', 'err'); cleanup(); return; }
       const blob = new Blob(chunks, { type: mimeType });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       const name = (document.getElementById('nftName').value || 'nft-card').replace(/[^a-z0-9]/gi, '-').toLowerCase();
       const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
-      a.download = `${name}-animated.${ext}`;
-      a.href = url;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      a.download = `${name}-animated.${ext}`; a.href = url;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      setStatus(`✅ Video downloaded! (${ext.toUpperCase()}, 5 seconds)`, 'ok');
+      setStatus(`✅ Video downloaded! (${ext.toUpperCase()}, 5s)`, 'ok');
       cleanup();
     };
-
-    recorder.start(100); // collect data every 100ms
-
-    // Countdown
+    recorder.start(100);
     let remaining = 5;
     const countdown = setInterval(() => {
       remaining--;
-      recTimer.textContent = remaining;
+      recTimerEl.textContent = remaining;
       progressFill.style.width = ((5 - remaining) / 5 * 100) + '%';
       if (remaining <= 0) clearInterval(countdown);
     }, 1000);
-
     setTimeout(() => {
-      clearInterval(countdown);
-      progressFill.style.width = '100%';
+      clearInterval(countdown); progressFill.style.width = '100%';
       if (recorder.state !== 'inactive') recorder.stop();
     }, 5000);
-
   } catch(e) {
-    setStatus('❌ Recording failed: ' + e.message, 'err');
-    cleanup();
+    setStatus('❌ Recording failed: ' + e.message, 'err'); cleanup();
   }
 
   function cleanup() {
     recIndicator.classList.remove('show');
-    progressWrap.classList.remove('show');
-    progressFill.style.width = '0%';
+    progressWrap.classList.remove('show'); progressFill.style.width = '0%';
     document.getElementById('videoBtn').disabled = false;
     document.getElementById('downloadBtn').disabled = false;
   }
 }
 
-// ── UPDATE PREVIEW SIZE ──
-function updatePreviewSize() {
+// ── PREVIEW STATUS ──
+setInterval(() => {
   document.getElementById('previewSize').textContent = '800 × 1200';
   document.getElementById('previewStatus').textContent = isAnimating ? 'LIVE🔥' : 'PAUSED';
-}
-setInterval(updatePreviewSize, 500);
+}, 500);
 
-// ── VIBRATE ON CLICK — ALL BUTTONS ──
-document.addEventListener('click', e => {
+// ── VIBRATE ON TOUCH & CLICK (instant on mobile) ──
+function triggerVibrate(el) {
+  if (!el || el.disabled) return;
+  el.classList.remove('vibrating');
+  void el.offsetWidth; // force reflow to restart animation
+  el.classList.add('vibrating');
+  // Native haptic feedback on supported devices
+  if (navigator.vibrate) navigator.vibrate(40);
+  el.addEventListener('animationend', () => el.classList.remove('vibrating'), { once: true });
+}
+
+// touchstart fires instantly (no 300ms delay)
+document.addEventListener('touchstart', e => {
   const btn = e.target.closest('button, .color-btn, .upload-zone');
-  if (!btn || btn.disabled) return;
-  btn.classList.remove('vibrating');
-  void btn.offsetWidth; // force reflow to restart animation
-  btn.classList.add('vibrating');
-  btn.addEventListener('animationend', () => btn.classList.remove('vibrating'), { once: true });
+  triggerVibrate(btn);
+}, { passive: true });
+
+// fallback for desktop mouse clicks
+document.addEventListener('click', e => {
+  // Skip if already handled by touchstart on this element
+  const btn = e.target.closest('button, .color-btn, .upload-zone');
+  if (!btn || btn._touchHandled) return;
+  triggerVibrate(btn);
 });
+
+// Mark touch-handled elements to avoid double-fire on mobile
+document.addEventListener('touchend', e => {
+  const btn = e.target.closest('button, .color-btn, .upload-zone');
+  if (!btn) return;
+  btn._touchHandled = true;
+  setTimeout(() => { btn._touchHandled = false; }, 600);
+}, { passive: true });
+
+// Init wallet UI
+updateWalletUI();
 </script>
 </body>
 </html>
